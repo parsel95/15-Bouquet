@@ -15,8 +15,8 @@ export default class ModalPresenter {
     this.#container = container;
   }
 
-  get element() {
-    return this.#modalViewComponent.element;
+  setCloseClickHandler(handler) {
+    this.#modalViewComponent.setCloseClickHandler(handler);
   }
 
   init = (bouquet) => {
@@ -26,7 +26,8 @@ export default class ModalPresenter {
     this.#modalSliderViewComponent = new ModalSliderView(this.#bouquet);
 
     render(this.#modalViewComponent, this.#container);
-    render(this.#modalSliderViewComponent, this.#modalViewComponent.getProductDescription(), RenderPosition.BEFOREBEGIN);
+    render(this.#modalSliderViewComponent, this.#modalViewComponent.descriptionContainer, RenderPosition.BEFOREBEGIN);
+    this.#modalSliderViewComponent.init();
   }
 
   destroy() {

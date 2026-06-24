@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractView from '../../framework/view/abstract-view.js';
 
 const createHeaderCountViewTemplate = ({productCount, sum}) =>
   `
@@ -32,5 +32,16 @@ export default class HeaderCountView extends AbstractView {
 
   get template() {
     return createHeaderCountViewTemplate(this.#deferred);
+  }
+
+  setClickHandler = (callback) => {
+    this._callback.click = callback;
+
+    this.element.addEventListener('click', this.#clickHandler);
+  }
+
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
   }
 }

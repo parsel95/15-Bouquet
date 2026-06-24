@@ -54,7 +54,18 @@ export default class ModalView extends AbstractView {
     return createModalViewTemplate(this.#bouquet);
   }
 
-  getProductDescription() {
+  get descriptionContainer() {
     return this.element.querySelector('.product-description');
+  }
+
+  setCloseClickHandler = (callback) => {
+    this._callback.click = callback;
+
+    this.element.querySelector('.modal-product__btn-close').addEventListener('click', this.#closeClickHandler);
+  }
+
+  #closeClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
   }
 }

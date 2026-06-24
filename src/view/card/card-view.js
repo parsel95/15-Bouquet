@@ -2,14 +2,16 @@ import AbstractView from '../../framework/view/abstract-view.js';
 import {createCardButtonHeartTemplate} from './card-button-heart-template.js';
 import {LabelType} from '../../const.js';
 
-const createCardViewTemplate = ({title, description, type, price, previewImage}) => {
+const createCardViewTemplate = ({title, description, type, price, previewImage}, isFavorite) => {
   const getLabelText = (type) => {
     return LabelType[type] || '';
   }
 
+  const getFavoriteClass = (isFavorite) => isFavorite ? 'is-favorite' : '';
+
   return `
     <li class="catalogue__item">
-      <div class="item-card">
+      <div class="item-card ${getFavoriteClass(isFavorite)}">
         <button
           class="item-card__btn"
           type="button"
@@ -39,16 +41,37 @@ const createCardViewTemplate = ({title, description, type, price, previewImage})
   `;
 }
 
-
 export default class CardView extends AbstractView {
   #bouquet = null;
+  #isFavorite = false;
 
-  constructor(bouquet) {
+  constructor(bouquet, isFavorite) {
     super();
     this.#bouquet = bouquet;
+    this.#isFavorite = isFavorite;
   }
 
   get template() {
-    return createCardViewTemplate(this.#bouquet);
+    return createCardViewTemplate(this.#bouquet, this.#isFavorite);
+  }
+
+  setOpenClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.item-card__btn').addEventListener('click', this.#openClickHandler);
+  }
+
+  setAddToDeferredClickHandler = (callback) => {
+    this._callback.addToDeferred = callback;
+    this.element.querySelector('.button-heart').addEventListener('click', this.#addToDeferredClickHandler);
+  }
+
+  #openClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  }
+
+  #addToDeferredClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.addToDeferred();
   }
 }

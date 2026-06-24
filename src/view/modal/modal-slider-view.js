@@ -1,5 +1,6 @@
 import AbstractView from '../../framework/view/abstract-view.js';
 import { createModalSliderImgTemplate } from './modal-slider-img-template.js';
+import ImageSlider from '../../utils/image-slider.js';
 
 const createModalSliderViewTemplate = ({authorPhoto, images}) => {
   const pictures = images.map((picture, index) =>
@@ -34,9 +35,9 @@ const createModalSliderViewTemplate = ({authorPhoto, images}) => {
   ;
 };
 
-
  export default class ModalSliderView extends AbstractView {
   #bouquet = null;
+  #slider = null;
 
   constructor(bouquet) {
     super();
@@ -45,6 +46,11 @@ const createModalSliderViewTemplate = ({authorPhoto, images}) => {
 
   get template() {
     return createModalSliderViewTemplate(this.#bouquet);
+  }
+
+  init() {
+    this.#slider = new ImageSlider(this.element);
+    this.#slider.init();
   }
  }
 

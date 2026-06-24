@@ -1,5 +1,5 @@
 import FilterColorView from '../view/filter-color/filter-color-view';
-import {render} from '../framework/render.js';
+import {render, remove} from '../framework/render.js';
 import {ColorType, ColorTypeText} from '../const.js';
 
 export default class FilterColorPresenter {
@@ -27,5 +27,9 @@ export default class FilterColorPresenter {
 
     this.#filterColorComponent = new FilterColorView(filters, this.#currentColor, text);
     render(this.#filterColorComponent, this.#container);
+  }
+
+  destroy() {
+    remove(this.#filterColorComponent);
   }
 }

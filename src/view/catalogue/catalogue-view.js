@@ -6,7 +6,7 @@ const createCatalogueTemplate = () =>
       <div class="container">
         <div class="catalogue__header">
           <h2 class="title title--h3 catalogue__title">Каталог</h2>
-          <div class="catalogue__sorting"></div>
+          <div class="catalogue__sorting" id="catalogue-sorting-container"></div>
         </div>
         <div class="catalogue__btn-wrap"></div>
       </div>
@@ -28,5 +28,9 @@ export default class CatalogueView extends AbstractView {
 
   getBtnWrap() {
     return this.element.querySelector('.catalogue__btn-wrap');
+  }
+
+  scrollToStart() {
+    this.getSortingContainer().scrollIntoView({behavior: 'smooth'});
   }
 }

@@ -1,9 +1,6 @@
-import {iosChecker} from './ios-checker';
-
 export class ScrollLock {
   constructor() {
-    this._iosChecker = iosChecker;
-    this._lockClass = this._iosChecker() ? 'scroll-lock-ios' : 'scroll-lock';
+    this._lockClass = 'scroll-lock';
     this._scrollTop = null;
     this._fixedBlockElements = document.querySelectorAll('[data-fix-block]');
   }

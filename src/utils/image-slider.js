@@ -1,10 +1,12 @@
-class ImageSlider {
+import '../vendor/swiper.js';
+
+export default class ImageSlider {
   constructor(sliderElement) {
     this.sliderElement = sliderElement;
   }
 
   init() {
-    if (document.querySelector(this.sliderElement)) {
+
       this.slider = new Swiper(this.sliderElement, {//eslint-disable-line
         slidesPerView: 1,
         spaceBetween: 100,
@@ -18,8 +20,6 @@ class ImageSlider {
           nextSlideMessage: 'Следующий слайд',
         },
       });
-    }
+
   }
 }
-
-export {ImageSlider};

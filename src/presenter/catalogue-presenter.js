@@ -3,7 +3,7 @@ import SortingView from '../view/sorting-view.js';
 import CatalogueListView from '../view/catalogue/catalogue-list-view.js';
 import CatalogueEmptyListView from '../view/catalogue/catalogue-empty-list.js';
 import CatalogueButtonMoreView from '../view/catalogue/catalogue-button-more-view.js';
-import ButtonToTopView from '../view/catalogue/cataloge-button-to-top-view.js';
+import ButtonToTopView from '../view/catalogue/catalogue-button-to-top-view.js';
 
 import CardPresenter from './card-presenter.js';
 import ModalPresenter from './modal-presenter.js';
@@ -12,7 +12,7 @@ import {render, RenderPosition, remove} from '../framework/render.js';
 
 const BOUQUET_COUNT_PER_STEP = 6;
 
-export default class CataloguePresentor {
+export default class CataloguePresenter {
   #catalogueViewComponent = new CatalogueView();
   #sortingViewComponent = new SortingView();
   #catalogueListViewComponent = new CatalogueListView();
@@ -20,28 +20,51 @@ export default class CataloguePresentor {
   #buttonMoreViewComponent = new CatalogueButtonMoreView();
   #buttonToTopViewComponent = new ButtonToTopView();
 
-  #mainContainer = null;
   #bodyContainer = null;
-  #buttonsContainer = this.#catalogueViewComponent.getBtnWrap();
+  #mainContainer = null;
   #bouquetsModel = null;
+  #deferredModel = null;
 
   #cardPresenter = null;
   #modalPresenter = null;
 
   #renderedBouquetsCount = BOUQUET_COUNT_PER_STEP;
+  #savedRenderedBouquetsCount = null;
 
-  constructor(mainContainer, bodyContainer, bouquetsModel) {
-    this.#mainContainer = mainContainer;
+  constructor(bodyContainer, mainContainer, bouquetsModel, deferredModel) {
     this.#bodyContainer = bodyContainer;
+    this.#mainContainer = mainContainer;
     this.#bouquetsModel = bouquetsModel;
+    this.#deferredModel = deferredModel;
   }
 
-  get bouquets () {
+  get bouquets() {
     return this.#bouquetsModel.get();
   };
 
-  init() {
+  get deferred() {
+    return this.#deferredModel.get();
+  }
+
+  getRenderedBouquetsCount() {
+    return this.#renderedBouquetsCount;
+  }
+
+  setRenderedBouquetsCount(count) {
+    this.#savedRenderedBouquetsCount = count;
+  }
+
+  init(savedCount) {
+    if (savedCount) {
+      this.#savedRenderedBouquetsCount = savedCount;
+      this.#renderedBouquetsCount = savedCount;
+    } else {
+      this.#savedRenderedBouquetsCount = null;
+      this.#renderedBouquetsCount = BOUQUET_COUNT_PER_STEP;
+    }
+
     this.#renderCatalogue();
+    this.#savedRenderedBouquetsCount = null;
   }
 
   #renderButtonMore(container) {
@@ -67,11 +90,7 @@ export default class CataloguePresentor {
 
   #renderButtonToTop(container) {
     render(this.#buttonToTopViewComponent, container);
-    this.#buttonToTopViewComponent.setClickHandler(this.#handleButtonToTopClick);
-  }
-
-  #handleButtonToTopClick = () => {
-    this.#catalogueViewComponent.getSortingContainer().scrollIntoView({behavior: 'smooth'});
+    this.#buttonToTopViewComponent.setClickHandler(() => this.#catalogueViewComponent.scrollToStart());
   }
 
   #renderButtons(container) {
@@ -83,33 +102,31 @@ export default class CataloguePresentor {
     this.#renderCards(bouquets, container);
 
     if (this.bouquets.length > BOUQUET_COUNT_PER_STEP) {
-      this.#renderButtonMore(this.#buttonsContainer);
+      this.#renderButtonMore(this.#catalogueViewComponent.getBtnWrap());
     }
 
-    this.#renderButtonToTop(this.#buttonsContainer);
+    this.#renderButtonToTop(this.#catalogueViewComponent.getBtnWrap());
   }
 
   #renderCards(bouquets, container) {
     bouquets.forEach((bouquet) => this.#renderCard(bouquet, container));
   }
 
+  #handleOpenModal = (bouquet) => {
+    this.#renderModal(bouquet, this.#bodyContainer);
+    this.#modalPresenter.setCloseClickHandler(this.#handleCloseModal);
+    document.addEventListener('keydown', this.#onEscKeyDown);
+  }
+
+  #handleCloseModal = () => {
+    this.#modalPresenter.destroy();
+    document.removeEventListener('keydown', this.#onEscKeyDown);
+  }
+
   #renderCard(bouquet, container) {
     const cardPresenter = new CardPresenter(container);
-
-    const openModal = () =>{
-      this.#renderModal(bouquet, this.#bodyContainer);
-      this.#modalPresenter.element.addEventListener('click', () => closeModal());
-      document.addEventListener('keydown', this.#onEscKeyDown);
-    }
-
-    const closeModal = () => {
-      this.#modalPresenter.destroy();
-      document.removeEventListener('keydown', this.#onEscKeyDown);
-    }
-
-    cardPresenter.init(bouquet);
-
-    cardPresenter.element.addEventListener('click', () => openModal());
+    cardPresenter.init(bouquet, this.deferred);
+    cardPresenter.setOpenClickHandler(() => this.#handleOpenModal(bouquet));
   }
 
   #renderModal(bouquet, container) {
@@ -118,28 +135,36 @@ export default class CataloguePresentor {
   }
 
   #renderCatalogue() {
-    const bouquets = this.bouquets.slice(0, Math.min(this.bouquets.length, BOUQUET_COUNT_PER_STEP));
+    const renderCount = this.#savedRenderedBouquetsCount || BOUQUET_COUNT_PER_STEP;
+    const bouquets = this.bouquets.slice(0, renderCount);
 
     render(this.#catalogueViewComponent, this.#mainContainer);
     render(this.#sortingViewComponent, this.#catalogueViewComponent.getSortingContainer());
 
-
     if (bouquets.length === 0) {
       render(this.#catalogueEmptyListViewComponent, this.#catalogueViewComponent.getBtnWrap(), RenderPosition.BEFOREBEGIN);
-      this.#renderButtons(this.#buttonsContainer);
+      this.#renderButtons(this.#catalogueViewComponent.getBtnWrap());
       return;
     }
 
-    render(this.#catalogueListViewComponent, this.#buttonsContainer, RenderPosition.BEFOREBEGIN);
-
+    render(this.#catalogueListViewComponent, this.#catalogueViewComponent.getBtnWrap(), RenderPosition.BEFOREBEGIN);
     this.#renderCardList(bouquets, this.#catalogueListViewComponent.element);
   }
 
   #onEscKeyDown = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      closeModal();
+      this.#handleCloseModal();
       document.removeEventListener('keydown', this.#onEscKeyDown);
     }
+  }
+
+  destroy() {
+    remove(this.#catalogueViewComponent);
+    remove(this.#sortingViewComponent);
+    remove(this.#catalogueListViewComponent);
+    remove(this.#catalogueEmptyListViewComponent);
+    remove(this.#buttonMoreViewComponent);
+    remove(this.#buttonToTopViewComponent);
   }
 }

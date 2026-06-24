@@ -1,5 +1,5 @@
 import FilterReasonView from '../view/filter-reason/filter-reason-view.js';
-import {render} from '../framework/render.js';
+import {render, remove} from '../framework/render.js';
 import {ReasonType, ReasonTypeText} from '../const.js';
 
 export default class FilterReasonPresenter {
@@ -27,5 +27,9 @@ export default class FilterReasonPresenter {
 
     this.#filterReasonComponent = new FilterReasonView(filters, this.#currentReason, text);
     render(this.#filterReasonComponent, this.#container);
+  }
+
+  destroy() {
+    remove(this.#filterReasonComponent);
   }
 }
