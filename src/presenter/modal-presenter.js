@@ -1,36 +1,58 @@
 import ModalView from '../view/modal/modal-view.js';
 import ModalSliderView from '../view/modal/modal-slider-view.js';
 
-import {render, RenderPosition, remove} from '../framework/render.js';
+import {render, RenderPosition, remove, replace} from '../framework/render.js';
 
 export default class ModalPresenter {
-  #container = null;
+  #modalComponent = null;
+  #modalSliderComponent = null;
 
-  #modalViewComponent = null;
-  #modalSliderViewComponent = null;
+  #container = null;
+  #deferredModel = null;
 
   #bouquet = null;
 
-  constructor(container) {
+  #changeData = null;
+  #closeBtnClickHandler = null;
+
+  constructor(container, deferredModel, changeData, closeBtnClickHandler) {
     this.#container = container;
+    this.#deferredModel = deferredModel;
+    this.#changeData = changeData;
+    this.#closeBtnClickHandler = closeBtnClickHandler;
   }
 
-  setCloseClickHandler(handler) {
-    this.#modalViewComponent.setCloseClickHandler(handler);
-  }
-
-  init = (bouquet) => {
+  init(bouquet) {
     this.#bouquet = bouquet;
 
-    this.#modalViewComponent = new ModalView(this.#bouquet);
-    this.#modalSliderViewComponent = new ModalSliderView(this.#bouquet);
+    const prevModalComponent = this.#modalComponent;
 
-    render(this.#modalViewComponent, this.#container);
-    render(this.#modalSliderViewComponent, this.#modalViewComponent.descriptionContainer, RenderPosition.BEFOREBEGIN);
-    this.#modalSliderViewComponent.init();
+    const isDeferred = this.#deferredModel.has(bouquet.id);
+    this.#modalComponent = new ModalView(this.#bouquet, isDeferred);
+    this.#modalSliderComponent = new ModalSliderView(this.#bouquet);
+
+    this.#modalComponent.setCloseClickHandler(this.#closeBtnClickHandler);
+    this.#modalComponent.setToggleDeferredClickHandler(this.#toggleDeferredClickHandler);
+
+    if (prevModalComponent === null) {
+      render(this.#modalComponent, this.#container);
+      render(this.#modalSliderComponent, this.#modalComponent.descriptionContainer, RenderPosition.BEFOREBEGIN);
+      this.#modalSliderComponent.init();
+      return;
+    }
+
+    replace(this.#modalComponent, prevModalComponent);
+    render(this.#modalSliderComponent, this.#modalComponent.descriptionContainer, RenderPosition.BEFOREBEGIN);
+    this.#modalSliderComponent.init();
+    remove(prevModalComponent);
+  }
+
+  #toggleDeferredClickHandler = () => {
+    this.#changeData({...this.#bouquet});
   }
 
   destroy() {
-    remove(this.#modalViewComponent);
+    remove(this.#modalComponent);
+    remove(this.#modalSliderComponent);
   }
 }

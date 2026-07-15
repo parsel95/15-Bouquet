@@ -1,6 +1,6 @@
 import AbstractView from '../../framework/view/abstract-view.js';
 
-const createButtonToTopViewTemplate = () =>
+const createScrollToTopButtonViewTemplate = () =>
   `
     <button
       class="btn-round btn-round--to-top btn-round--size-small catalogue__to-top-btn"
@@ -13,9 +13,9 @@ const createButtonToTopViewTemplate = () =>
     </button>
   `;
 
-export default class ButtonToTopView extends AbstractView {
+export default class ScrollToTopButtonView extends AbstractView {
   get template() {
-    return createButtonToTopViewTemplate();
+    return createScrollToTopButtonViewTemplate();
   }
 
   setClickHandler = (callback) => {

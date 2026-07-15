@@ -11,9 +11,9 @@ import {render, remove} from '../framework/render.js';
 import {ReasonType, ColorType} from '../const.js';
 
 export default class MainPagePresenter {
-  #heroViewComponent = new HeroView();
-  #missionViewComponent = new MissionView();
-  #advantagesViewComponent = new AdvantagesView();
+  #heroComponent = new HeroView();
+  #missionComponent = new MissionView();
+  #advantagesComponent = new AdvantagesView();
 
   #bodyContainer = null;
   #mainContainer = null;
@@ -46,9 +46,9 @@ export default class MainPagePresenter {
   }
 
   #renderStaticSections() {
-    render(this.#heroViewComponent, this.#mainContainer);
-    render(this.#missionViewComponent, this.#mainContainer);
-    render(this.#advantagesViewComponent, this.#mainContainer);
+    render(this.#heroComponent, this.#mainContainer);
+    render(this.#missionComponent, this.#mainContainer);
+    render(this.#advantagesComponent, this.#mainContainer);
   }
 
   #renderFiltersSections() {
@@ -72,9 +72,9 @@ export default class MainPagePresenter {
   }
 
   destroy() {
-    remove(this.#heroViewComponent);
-    remove(this.#missionViewComponent);
-    remove(this.#advantagesViewComponent);
+    remove(this.#heroComponent);
+    remove(this.#missionComponent);
+    remove(this.#advantagesComponent);
 
     this.#filterReasonPresenter.destroy();
     this.#filterColorPresenter.destroy();

@@ -1,4 +1,4 @@
-export class ScrollLock {
+export default class ScrollLock {
   constructor() {
     this._lockClass = 'scroll-lock';
     this._scrollTop = null;
@@ -41,5 +41,3 @@ export class ScrollLock {
     this._scrollTop = null;
   }
 }
-
-window.scrollLock = new ScrollLock();

@@ -1,40 +1,51 @@
 import CardView from '../view/card/card-view.js';
-import {render, remove} from '../framework/render.js';
+import {render, remove, replace} from '../framework/render.js';
 
 export default class CardPresenter {
+  #cardComponent = null;
+
   #container = null;
-  #cardViewComponent = null;
+  #deferredModel = null;
+
   #bouquet = null;
-  #deferred = null;
-  #isFavorite = false;
 
-  constructor(container) {
+  #changeData = null;
+  #clickCardHandler = null;
+
+  constructor(container, deferredModel, changeData, clickCardHandler) {
     this.#container = container;
+    this.#deferredModel = deferredModel;
+    this.#changeData = changeData;
+    this.#clickCardHandler = clickCardHandler;
   }
 
-  init(bouquet, deferred) {
+  init(bouquet) {
     this.#bouquet = bouquet;
-    this.#deferred = deferred;
 
-    this.#setIsFavorite();
-    this.#cardViewComponent = new CardView(this.#bouquet, this.#isFavorite);
+    const prevCardComponent = this.#cardComponent;
 
-    render(this.#cardViewComponent, this.#container);
+    const isDeferred = this.#deferredModel.has(bouquet.id);
+    this.#cardComponent = new CardView(this.#bouquet, isDeferred);
+
+    this.#cardComponent.setOpenClickHandler(() => {
+      this.#clickCardHandler(this.#bouquet);
+    });
+    this.#cardComponent.setToggleDeferredClickHandler(this.#toggleDeferredClickHandler);
+
+    if (prevCardComponent === null) {
+      render(this.#cardComponent, this.#container);
+      return;
+    }
+
+    replace(this.#cardComponent, prevCardComponent);
+    remove(prevCardComponent);
   }
 
-  #setIsFavorite() {
-    this.#isFavorite = this.#bouquet.id in this.#deferred.products;
-  }
-
-  setOpenClickHandler(handler) {
-    this.#cardViewComponent.setOpenClickHandler(handler);
-  }
-
-  setAddToDeferredClickHanlder(handler) {
-    this.#cardViewComponent.setAddToDeferredClickHanlder(handler);
+  #toggleDeferredClickHandler = () => {
+    this.#changeData({...this.#bouquet});
   }
 
   destroy() {
-    remove(this.#cardViewComponent);
+    remove(this.#cardComponent);
   }
 }

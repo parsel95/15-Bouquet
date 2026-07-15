@@ -11,14 +11,14 @@ import {render, RenderPosition, remove} from '../framework/render.js';
 import {bouquets} from '../mock/bouquets.js';
 
 export default class DeferredPresenter {
-  #deferredViewComponent = new DeferredView();
-  #heroDeferredViewComponent = new HeroView({isPopup: true});
-  #deferredBackButtonViewComponent = new DeferredBackButtonView();
-  #deferredCatalogViewComponent = new DeferredCatalogView();
-  #deferredCatalogItemViewComponent = null;
-  #deferredBtnContainerViewComponent = new DeferredBtnContainerView();
-  #deferredCleanButtonViewComponent = new DeferredCleanButtonView();
-  #deferredSumViewComponent = null;
+  #deferredComponent = new DeferredView();
+  #heroDeferredComponent = new HeroView({isPopup: true});
+  #deferredBackButtonComponent = new DeferredBackButtonView();
+  #deferredCatalogComponent = new DeferredCatalogView();
+  #deferredCatalogItemComponent = null;
+  #deferredBtnContainerComponent = new DeferredBtnContainerView();
+  #deferredCleanButtonComponent = new DeferredCleanButtonView();
+  #deferredSumComponent = null;
 
   #container = null;
   #bouquetsModel = null;
@@ -48,8 +48,8 @@ export default class DeferredPresenter {
   }
 
   #renderHeroBlock() {
-    render(this.#heroDeferredViewComponent, this.#deferredViewComponent.element, RenderPosition.AFTERBEGIN);
-    this.#heroDeferredViewComponent.setCloseClickHandler(this.#handleBackToMain);
+    render(this.#heroDeferredComponent, this.#deferredComponent.element, RenderPosition.AFTERBEGIN);
+    this.#heroDeferredComponent.setCloseClickHandler(this.#handleBackToMain);
   }
 
   #renderDeferredItems() {
@@ -61,34 +61,34 @@ export default class DeferredPresenter {
 
       const deferredItemViewComponent = new DeferredCatalogItemView(bouquet, count);
 
-      render(deferredItemViewComponent, this.#deferredCatalogViewComponent.element);
+      render(deferredItemViewComponent, this.#deferredCatalogComponent.element);
     })
   }
 
   #renderDeferredContent() {
-    this.#deferredSumViewComponent = new DeferredSumView(this.deferred);
-    render(this.#deferredBackButtonViewComponent, this.#deferredViewComponent.getDeferredContainer());
-    this.#deferredBackButtonViewComponent.setClickHandler(this.#handleCloseDeferred);
-    render(this.#deferredCatalogViewComponent, this.#deferredViewComponent.getDeferredContainer());
+    this.#deferredSumComponent = new DeferredSumView(this.deferred);
+    render(this.#deferredBackButtonComponent, this.#deferredComponent.getDeferredContainer());
+    this.#deferredBackButtonComponent.setClickHandler(this.#handleCloseDeferred);
+    render(this.#deferredCatalogComponent, this.#deferredComponent.getDeferredContainer());
     this.#renderDeferredItems();
-    render(this.#deferredBtnContainerViewComponent, this.#deferredViewComponent.getDeferredContainer());
-    render(this.#deferredCleanButtonViewComponent, this.#deferredBtnContainerViewComponent.element);
-    render(this.#deferredSumViewComponent, this.#deferredViewComponent.getDeferredContainer());
+    render(this.#deferredBtnContainerComponent, this.#deferredComponent.getDeferredContainer());
+    render(this.#deferredCleanButtonComponent, this.#deferredBtnContainerComponent.element);
+    render(this.#deferredSumComponent, this.#deferredComponent.getDeferredContainer());
   }
 
   #renderDeferredPage() {
-    render(this.#deferredViewComponent, this.#container);
+    render(this.#deferredComponent, this.#container);
     this.#renderHeroBlock();
     this.#renderDeferredContent();
   }
 
   destroy() {
-    remove(this.#deferredViewComponent);
-    remove(this.#heroDeferredViewComponent);
-    remove(this.#deferredBackButtonViewComponent);
-    remove(this.#deferredCatalogViewComponent);
-    remove(this.#deferredCatalogItemViewComponent);
-    remove(this.#deferredCleanButtonViewComponent);
-    remove(this.#deferredSumViewComponent);
+    remove(this.#deferredComponent);
+    remove(this.#heroDeferredComponent);
+    remove(this.#deferredBackButtonComponent);
+    remove(this.#deferredCatalogComponent);
+    remove(this.#deferredCatalogItemComponent);
+    remove(this.#deferredCleanButtonComponent);
+    remove(this.#deferredSumComponent);
   }
 }

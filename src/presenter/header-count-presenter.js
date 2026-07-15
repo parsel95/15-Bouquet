@@ -3,7 +3,7 @@ import HeaderCountView from '../view/header/header-count-view.js';
 import {render} from '../framework/render.js';
 
 export default class HeaderCountPresenter {
-  #headerCountViewComponent = null;
+  #headerCountComponent = null;
 
   #container = null;
   #bodyContainer = null;
@@ -29,9 +29,9 @@ export default class HeaderCountPresenter {
   }
 
   #renderHeaderCount() {
-    this.#headerCountViewComponent = new HeaderCountView(this.deferred);
+    this.#headerCountComponent = new HeaderCountView(this.deferred);
 
-    render(this.#headerCountViewComponent, this.#container);
-    this.#headerCountViewComponent.setClickHandler(this.#handleOpenDeferred);
+    render(this.#headerCountComponent, this.#container);
+    this.#headerCountComponent.setClickHandler(this.#handleOpenDeferred);
   }
 }

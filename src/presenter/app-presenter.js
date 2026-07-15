@@ -11,10 +11,10 @@ import {setToZeroOpacity, setToFullOpacity} from '../utils/animation.js';
 import {logoParentName, Page} from '../const.js';
 
 export default class AppPresenter {
-  #headerViewComponent = new HeaderView();
-  #footerViewComponent = new FooterView();
-  #logoHeaderViewComponent = new LogoView();
-  #logoFooterViewComponent = new LogoView(logoParentName);
+  #headerComponent = new HeaderView();
+  #footerComponent = new FooterView();
+  #logoHeaderComponent = new LogoView();
+  #logoFooterComponent = new LogoView(logoParentName);
 
   #bodyContainer = null;
   #wrapperContainer = null;
@@ -47,12 +47,12 @@ export default class AppPresenter {
   }
 
   init() {
-    render(this.#headerViewComponent, this.#wrapperContainer, RenderPosition.AFTERBEGIN);
-    render(this.#logoHeaderViewComponent, this.#headerViewComponent.logoContainer);
-    this.#logoHeaderViewComponent.setClickHandler(() => this.#switchPage(Page.MAIN));
+    render(this.#headerComponent, this.#wrapperContainer, RenderPosition.AFTERBEGIN);
+    render(this.#logoHeaderComponent, this.#headerComponent.logoContainer);
+    this.#logoHeaderComponent.setClickHandler(() => this.#switchPage(Page.MAIN));
 
     this.#headerCountPresenter = new HeaderCountPresenter(
-      this.#headerViewComponent.headerContainer,
+      this.#headerComponent.headerContainer,
       this.#bodyContainer,
       this.#bouquetsModel,
       this.#deferredModel,
@@ -69,9 +69,9 @@ export default class AppPresenter {
     );
     this.#mainPagePresenter.init(this.#renderedBouquetsCount);
 
-    render(this.#footerViewComponent, this.#wrapperContainer);
-    render(this.#logoFooterViewComponent, this.#footerViewComponent.logoContainer);
-    this.#logoFooterViewComponent.setClickHandler(() => this.#switchPage(Page.MAIN));
+    render(this.#footerComponent, this.#wrapperContainer);
+    render(this.#logoFooterComponent, this.#footerComponent.logoContainer);
+    this.#logoFooterComponent.setClickHandler(() => this.#switchPage(Page.MAIN));
   }
 
   #switchPage = (targetPage, shouldRestore = false, time = 500) => {

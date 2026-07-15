@@ -18,19 +18,15 @@ export default class CatalogueView extends AbstractView {
     return createCatalogueTemplate();
   }
 
-  getListContainer() {
-    return this.element.querySelector('.container');
-  }
-
   getSortingContainer() {
     return this.element.querySelector('.catalogue__sorting');
   }
 
-  getBtnWrap() {
+  getButtonsContainer() {
     return this.element.querySelector('.catalogue__btn-wrap');
   }
 
-  scrollToStart() {
+  scrollToSorting() {
     this.getSortingContainer().scrollIntoView({behavior: 'smooth'});
   }
 }

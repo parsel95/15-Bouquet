@@ -1,6 +1,6 @@
 import AbstractView from '../../framework/view/abstract-view.js';
 
-const createModalViewTemplate = ({title, description, price}) =>
+const createModalViewTemplate = ({title, description, price}, isDeferred) =>
   `
     <div class="modal modal--product product-card-active is-active" data-modal="product-card">
       <div class="modal__wrapper">
@@ -33,7 +33,8 @@ const createModalViewTemplate = ({title, description, price}) =>
 
               <p class="text text--size-40">${description}</p>
 
-              <button class="btn btn--outlined btn--full-width product-description__button" type="button" data-focus="">отложить
+              <button class="btn btn--outlined btn--full-width product-description__button" type="button" data-focus="">
+                ${isDeferred ? `отложено` : `отложить`}
               </button>
             </div>
           </div>
@@ -44,14 +45,16 @@ const createModalViewTemplate = ({title, description, price}) =>
 
 export default class ModalView extends AbstractView {
   #bouquet = null;
+  #isDeferred = false;
 
-  constructor(bouquet) {
+  constructor(bouquet, isDeferred) {
     super();
     this.#bouquet = bouquet;
+    this.#isDeferred = isDeferred;
   }
 
   get template() {
-    return createModalViewTemplate(this.#bouquet);
+    return createModalViewTemplate(this.#bouquet, this.#isDeferred);
   }
 
   get descriptionContainer() {
@@ -60,12 +63,21 @@ export default class ModalView extends AbstractView {
 
   setCloseClickHandler = (callback) => {
     this._callback.click = callback;
-
     this.element.querySelector('.modal-product__btn-close').addEventListener('click', this.#closeClickHandler);
+  }
+
+  setToggleDeferredClickHandler = (callback) => {
+    this._callback.toggleDeferred = callback;
+    this.element.querySelector('.product-description__button').addEventListener('click', this.#toggleDeferredClickHandler);
   }
 
   #closeClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
+  }
+
+  #toggleDeferredClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.toggleDeferred();
   }
 }
