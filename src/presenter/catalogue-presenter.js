@@ -8,9 +8,10 @@ import ScrollToTopButtonView from '../view/catalogue/catalogue-scroll-to-top-but
 import CardPresenter from './card-presenter.js';
 import ModalPresenter from './modal-presenter.js';
 
-import {render, RenderPosition, remove} from '../framework/render.js';
-import {updateItem} from '../utils/common.js';
+import {render, RenderPosition, remove, replace} from '../framework/render.js';
+import {updateItem, sortBouquetsByPriceUp, sortBouquetsByPriceDown} from '../utils/common.js';
 import ScrollLock from '../utils/scroll-lock.js';
+import {SortType} from '../const.js';
 
 const BOUQUET_COUNT_PER_STEP = 6;
 
@@ -30,10 +31,11 @@ export default class CataloguePresenter {
   #cardPresenters = new Map();
   #modalPresenter = null;
 
-  #bouquets = [];
   #selectedBouquet = null;
   #renderedBouquetsCount = BOUQUET_COUNT_PER_STEP;
   #savedRenderedBouquetsCount = null;
+  #currentSortType = SortType.PRICE_UP;
+  #sourcedBouquets = [];
 
   #scrollLock = new ScrollLock();
 
@@ -45,7 +47,14 @@ export default class CataloguePresenter {
   }
 
   get bouquets() {
-    return this.#bouquetsModel.get();
+    const bouquets = this.#bouquetsModel.get();
+
+    switch (this.#currentSortType) {
+      case SortType.PRICE_UP:
+        return bouquets.sort(sortBouquetsByPriceUp);
+      case SortType.PRICE_DOWN:
+        return bouquets.sort(sortBouquetsByPriceDown);
+    }
   }
 
   get deferred() {
@@ -57,7 +66,6 @@ export default class CataloguePresenter {
   }
 
   init(savedCount) {
-    this.#bouquets = this.bouquets;
     if (savedCount) {
       this.#savedRenderedBouquetsCount = savedCount;
       this.#renderedBouquetsCount = savedCount;
@@ -89,7 +97,7 @@ export default class CataloguePresenter {
   }
 
   #handleLoadMoreClick = () => {
-    const bouquetsCount = this.#bouquets.length;
+    const bouquetsCount = this.bouquets.length;
 
     if (bouquetsCount === 0) {
       return;
@@ -97,7 +105,7 @@ export default class CataloguePresenter {
 
     const newRenderedBouquetsCount = Math.min(bouquetsCount, this.#renderedBouquetsCount + BOUQUET_COUNT_PER_STEP);
 
-    const bouquets = this.#bouquets.slice(this.#renderedBouquetsCount, newRenderedBouquetsCount);
+    const bouquets = this.bouquets.slice(this.#renderedBouquetsCount, newRenderedBouquetsCount);
 
     this.#renderCards(bouquets, this.#catalogueListComponent.element);
 
@@ -108,14 +116,35 @@ export default class CataloguePresenter {
     }
   }
 
-  #renderScrollToTopButton(container) {
-    render(this.#scrollToTopButtonComponent, container);
-    this.#scrollToTopButtonComponent.setClickHandler(() => this.#catalogueComponent.scrollToSorting());
+  #handleSortTypeChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#currentSortType = sortType;
+
+    const bouquets = this.bouquets.slice(0, BOUQUET_COUNT_PER_STEP);
+    this.#clearCatalogueList();
+    this.#renderSorting(this.#catalogueComponent.getSortingContainer());
+    this.#renderCatalogueList(bouquets, this.#catalogueComponent.getButtonsContainer());
   }
 
   #renderSorting(container) {
-    this.#sortingComponent = new SortingView();
-    render(this.#sortingComponent, container);
+    if (!this.#sortingComponent) {
+      this.#sortingComponent = new SortingView(this.#currentSortType);
+      render(this.#sortingComponent, container);
+    } else {
+      const updatedSortingComponent = new SortingView(this.#currentSortType);
+      replace(updatedSortingComponent, this.#sortingComponent);
+      this.#sortingComponent = updatedSortingComponent;
+    }
+
+    this.#sortingComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
+  }
+
+  #renderScrollToTopButton(container) {
+    render(this.#scrollToTopButtonComponent, container);
+    this.#scrollToTopButtonComponent.setClickHandler(() => this.#catalogueComponent.scrollToSorting());
   }
 
   #clearCatalogueList() {
@@ -131,7 +160,7 @@ export default class CataloguePresenter {
     render(this.#catalogueListComponent, container, RenderPosition.BEFOREBEGIN);
     this.#renderCards(bouquets, this.#catalogueListComponent.element);
 
-    if (this.#renderedBouquetsCount < this.#bouquets.length) {
+    if (this.#renderedBouquetsCount < this.bouquets.length) {
       this.#renderLoadMoreButton(container);
     }
 
@@ -202,7 +231,7 @@ export default class CataloguePresenter {
 
   #renderCatalogue() {
     const renderCount = this.#savedRenderedBouquetsCount ?? BOUQUET_COUNT_PER_STEP;
-    const bouquets = this.#bouquets.slice(0, renderCount);
+    const bouquets = this.bouquets.slice(0, renderCount);
     const buttonsContainer = this.#catalogueComponent.getButtonsContainer();
 
     render(this.#catalogueComponent, this.#mainContainer);

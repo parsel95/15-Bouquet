@@ -54,6 +54,11 @@ const Page = {
   DEFERRED: 'DEFERRED'
 }
 
+const SortType = {
+  PRICE_UP: 'price-up',
+  PRICE_DOWN: 'price-down'
+}
+
 export {
   ReasonType,
   ReasonTypeText,
@@ -62,5 +67,6 @@ export {
   LabelType,
   LogoConfig,
   logoParentName,
-  Page
+  Page,
+  SortType
 };
