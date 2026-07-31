@@ -9,7 +9,7 @@ import CardPresenter from './card-presenter.js';
 import ModalPresenter from './modal-presenter.js';
 
 import {render, RenderPosition, remove, replace} from '../framework/render.js';
-import {updateItem, sortBouquetsByPriceUp, sortBouquetsByPriceDown} from '../utils/common.js';
+import {sortBouquetsByPriceUp, sortBouquetsByPriceDown} from '../utils/common.js';
 import ScrollLock from '../utils/scroll-lock.js';
 import {SortType} from '../const.js';
 
@@ -35,7 +35,6 @@ export default class CataloguePresenter {
   #renderedBouquetsCount = BOUQUET_COUNT_PER_STEP;
   #savedRenderedBouquetsCount = null;
   #currentSortType = SortType.PRICE_UP;
-  #sourcedBouquets = [];
 
   #scrollLock = new ScrollLock();
 
@@ -78,16 +77,15 @@ export default class CataloguePresenter {
     this.#savedRenderedBouquetsCount = null;
   }
 
-  #handleUpdateBouquet = (updatedBouquet) => {
+  #handleCardDeferredToggle = (updatedBouquet) => {
     this.#deferredModel.toggleFavorite(updatedBouquet);
     this.#cardPresenters.get(updatedBouquet.id).init(updatedBouquet);
   };
 
-  #handleUpdateModal = (updatedBouquet) => {
+  #handleModalDeferredToggle = (updatedBouquet) => {
     if (this.#modalPresenter && this.#selectedBouquet.id === updatedBouquet.id) {
       this.#selectedBouquet = updatedBouquet;
       this.#deferredModel.toggleFavorite(updatedBouquet);
-      this.#renderModal();
     }
   }
 
@@ -175,7 +173,7 @@ export default class CataloguePresenter {
     const cardPresenter = new CardPresenter(
       container,
       this.#deferredModel,
-      this.#handleUpdateBouquet,
+      this.#handleCardDeferredToggle,
       this.#handleOpenModal
     );
 
@@ -215,7 +213,7 @@ export default class CataloguePresenter {
       this.#modalPresenter = new ModalPresenter(
         this.#bodyContainer,
         this.#deferredModel,
-        this.#handleUpdateModal,
+        this.#handleModalDeferredToggle,
         this.#handleCloseModal
       );
     }

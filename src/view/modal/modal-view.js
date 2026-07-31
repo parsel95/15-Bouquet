@@ -1,6 +1,8 @@
 import AbstractView from '../../framework/view/abstract-view.js';
+import {createModalSliderTemplate} from './modal-slider-template.js';
+import ImageSlider from '../../utils/image-slider.js';
 
-const createModalViewTemplate = ({title, description, price}, isDeferred) =>
+const createModalViewTemplate = ({title, description, price, authorPhoto, images}, isDeferred) =>
   `
     <div class="modal modal--product product-card-active is-active" data-modal="product-card">
       <div class="modal__wrapper">
@@ -22,6 +24,8 @@ const createModalViewTemplate = ({title, description, price}, isDeferred) =>
               <use xlink:href="#icon-loader"></use>
             </svg>
 
+            ${createModalSliderTemplate({authorPhoto, images})}
+
             <div class="product-description">
               <div class="product-description__header">
                 <h3 class="title title--h2">${title}</h3>
@@ -34,7 +38,7 @@ const createModalViewTemplate = ({title, description, price}, isDeferred) =>
               <p class="text text--size-40">${description}</p>
 
               <button class="btn btn--outlined btn--full-width product-description__button" type="button" data-focus="">
-                ${isDeferred ? `отложено` : `отложить`}
+                ${isDeferred ? 'отложено' : 'отложить'}
               </button>
             </div>
           </div>
@@ -46,6 +50,7 @@ const createModalViewTemplate = ({title, description, price}, isDeferred) =>
 export default class ModalView extends AbstractView {
   #bouquet = null;
   #isDeferred = false;
+  #slider = null;
 
   constructor(bouquet, isDeferred) {
     super();
@@ -57,27 +62,36 @@ export default class ModalView extends AbstractView {
     return createModalViewTemplate(this.#bouquet, this.#isDeferred);
   }
 
-  get descriptionContainer() {
-    return this.element.querySelector('.product-description');
+  initSlider() {
+    const sliderElement = this.element.querySelector('.image-slider');
+
+    this.#slider = new ImageSlider(sliderElement);
+    this.#slider.init();
   }
 
   setCloseClickHandler = (callback) => {
-    this._callback.click = callback;
+    this._callback.closeClick = callback;
     this.element.querySelector('.modal-product__btn-close').addEventListener('click', this.#closeClickHandler);
   }
 
-  setToggleDeferredClickHandler = (callback) => {
-    this._callback.toggleDeferred = callback;
-    this.element.querySelector('.product-description__button').addEventListener('click', this.#toggleDeferredClickHandler);
+  setDeferredClickHandler = (callback) => {
+    this._callback.deferredClick = callback;
+    this.element.querySelector('.product-description__button').addEventListener('click', this.#deferredClickHandler);
+  }
+
+  updateDeferredStatus(isDeferred) {
+    this.#isDeferred = isDeferred;
+    const button = this.element.querySelector('.product-description__button');
+    button.textContent = this.#isDeferred ? `отложено` : `отложить`;
   }
 
   #closeClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.closeClick();
   }
 
-  #toggleDeferredClickHandler = (evt) => {
+  #deferredClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.toggleDeferred();
+    this._callback.deferredClick();
   }
 }

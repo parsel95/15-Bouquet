@@ -1,10 +1,10 @@
-import AbstractView from '../../framework/view/abstract-view.js';
 import { createModalSliderImgTemplate } from './modal-slider-img-template.js';
-import ImageSlider from '../../utils/image-slider.js';
 
-const createModalSliderViewTemplate = ({authorPhoto, images}) => {
+export const createModalSliderTemplate = ({authorPhoto, images}) => {
+
   const pictures = images.map((picture, index) =>
     createModalSliderImgTemplate(picture, authorPhoto, index)).join('');
+
   return `
       <div class="image-slider swiper modal-product__slider">
         <div class="image-slides-list swiper-wrapper">
@@ -34,23 +34,4 @@ const createModalSliderViewTemplate = ({authorPhoto, images}) => {
     `
   ;
 };
-
- export default class ModalSliderView extends AbstractView {
-  #bouquet = null;
-  #slider = null;
-
-  constructor(bouquet) {
-    super();
-    this.#bouquet = bouquet;
-  }
-
-  get template() {
-    return createModalSliderViewTemplate(this.#bouquet);
-  }
-
-  init() {
-    this.#slider = new ImageSlider(this.element);
-    this.#slider.init();
-  }
- }
 
