@@ -56,22 +56,22 @@ export default class CardView extends AbstractView {
   }
 
   setOpenClickHandler = (callback) => {
-    this._callback.click = callback;
+    this._callback.openClick = callback;
     this.element.querySelector('.item-card__btn').addEventListener('click', this.#openClickHandler);
   }
 
-  setToggleDeferredClickHandler = (callback) => {
-    this._callback.toggleDeferred = callback;
-    this.element.querySelector('.button-heart').addEventListener('click', this.#toggleDeferredClickHandler);
+  setDeferredClickHandler = (callback) => {
+    this._callback.deferredClick = callback;
+    this.element.querySelector('.button-heart').addEventListener('click', this.#deferredClickHandler);
   }
 
   #openClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.openClick();
   }
 
-  #toggleDeferredClickHandler = (evt) => {
+  #deferredClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.toggleDeferred();
+    this._callback.deferredClick();
   }
 }

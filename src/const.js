@@ -59,6 +59,19 @@ const SortType = {
   PRICE_DOWN: 'price-down'
 }
 
+const UserAction = {
+  UPDATE_BOUQUET: 'UPDATE_BOUQUET',
+  ADD_BOUQUET: 'ADD_BOUQUET',
+  DELETE_BOUQUET: 'DELETE_BOUQUET'
+}
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+  INIT: 'INIT'
+}
+
 export {
   ReasonType,
   ReasonTypeText,
@@ -68,5 +81,7 @@ export {
   LogoConfig,
   logoParentName,
   Page,
-  SortType
+  SortType,
+  UserAction,
+  UpdateType
 };

@@ -1,5 +1,6 @@
 import CardView from '../view/card/card-view.js';
 import {render, remove, replace} from '../framework/render.js';
+import {UserAction, UpdateType} from '../const.js';
 
 export default class CardPresenter {
   #cardComponent = null;
@@ -30,7 +31,7 @@ export default class CardPresenter {
     this.#cardComponent.setOpenClickHandler(() => {
       this.#clickCardHandler(this.#bouquet);
     });
-    this.#cardComponent.setToggleDeferredClickHandler(this.#toggleDeferredClickHandler);
+    this.#cardComponent.setDeferredClickHandler(this.#handleDeferredClick);
 
     if (prevCardComponent === null) {
       render(this.#cardComponent, this.#container);
@@ -41,8 +42,12 @@ export default class CardPresenter {
     remove(prevCardComponent);
   }
 
-  #toggleDeferredClickHandler = () => {
-    this.#changeData({...this.#bouquet});
+  #handleDeferredClick = () => {
+    this.#changeData(
+      UserAction.UPDATE_BOUQUET,
+      UpdateType.PATCH,
+      {...this.#bouquet}
+    );
   }
 
   destroy() {

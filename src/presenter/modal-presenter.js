@@ -1,6 +1,6 @@
 import ModalView from '../view/modal/modal-view.js';
-
 import {render, remove, replace} from '../framework/render.js';
+import {UserAction, UpdateType} from '../const.js';
 
 export default class ModalPresenter {
   #modalComponent = null;
@@ -43,8 +43,14 @@ export default class ModalPresenter {
   }
 
   #handleDeferredClick = () => {
-    this.#changeData({...this.#bouquet});
+    this.#changeData(
+      UserAction.UPDATE_BOUQUET,
+      UpdateType.PATCH,
+      {...this.#bouquet}
+    );
+  }
 
+  updateDeferredStatus() {
     const isDeferred = this.#deferredModel.has(this.#bouquet.id);
     this.#modalComponent.updateDeferredStatus(isDeferred);
   }

@@ -1,6 +1,7 @@
+import Observable from '../framework/observable.js';
 import {deferredBoquets} from '../mock/deferred-bouquets.js';
 
-export default class DeferredModel {
+export default class DeferredModel extends Observable {
   #deferredBouquets = deferredBoquets;
 
   get = () => this.#deferredBouquets;
@@ -9,7 +10,7 @@ export default class DeferredModel {
     return Object.hasOwn(this.#deferredBouquets.products, bouquetId);
   }
 
-  add = (bouquet) => {
+  add = (bouquet, updateType) => {
     this.#deferredBouquets.products[bouquet.id] = 1;
   }
 
@@ -17,11 +18,13 @@ export default class DeferredModel {
     delete this.#deferredBouquets.products[bouquet.id];
   }
 
-  toggleFavorite = (bouquet) => {
+  toggleFavorite = (bouquet, updateType) => {
     if (this.has(bouquet.id)) {
       this.delete(bouquet);
     } else {
-      this.add(bouquet);
+      this.add(bouquet, updateType);
     }
+
+    this._notify(updateType, bouquet);
   }
 }

@@ -11,7 +11,7 @@ import ModalPresenter from './modal-presenter.js';
 import {render, RenderPosition, remove, replace} from '../framework/render.js';
 import {sortBouquetsByPriceUp, sortBouquetsByPriceDown} from '../utils/common.js';
 import ScrollLock from '../utils/scroll-lock.js';
-import {SortType} from '../const.js';
+import {SortType, UserAction, UpdateType} from '../const.js';
 
 const BOUQUET_COUNT_PER_STEP = 6;
 
@@ -43,6 +43,7 @@ export default class CataloguePresenter {
     this.#mainContainer = mainContainer;
     this.#bouquetsModel = bouquetsModel;
     this.#deferredModel = deferredModel;
+    this.#deferredModel.addObserver(this.#handleModelEvent);
   }
 
   get bouquets() {
@@ -50,9 +51,9 @@ export default class CataloguePresenter {
 
     switch (this.#currentSortType) {
       case SortType.PRICE_UP:
-        return bouquets.sort(sortBouquetsByPriceUp);
+        return [...bouquets].sort(sortBouquetsByPriceUp);
       case SortType.PRICE_DOWN:
-        return bouquets.sort(sortBouquetsByPriceDown);
+        return [...bouquets].sort(sortBouquetsByPriceDown);
     }
   }
 
@@ -77,15 +78,61 @@ export default class CataloguePresenter {
     this.#savedRenderedBouquetsCount = null;
   }
 
-  #handleCardDeferredToggle = (updatedBouquet) => {
-    this.#deferredModel.toggleFavorite(updatedBouquet);
-    this.#cardPresenters.get(updatedBouquet.id).init(updatedBouquet);
-  };
+  #handleViewAction = (actionType, updateType, updateBouquet) => {
+    switch (actionType) {
+      case UserAction.UPDATE_BOUQUET:
+        this.#handleUpdateBouquet(updateType, updateBouquet);
+        break;
 
-  #handleModalDeferredToggle = (updatedBouquet) => {
+      case UserAction.ADD_BOUQUET:
+        console.log(actionType, updateType, updateBouquet);
+        break;
+
+      case UserAction.DELETE_BOUQUET:
+        console.log(actionType, updateType, update);
+        break;
+    }
+  }
+
+  #handleUpdateBouquet(updateType, updatedBouquet) {
+    this.#deferredModel.toggleFavorite(updatedBouquet, updateType);
+  }
+
+  #handleModelEvent = (updateType, data) => {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this.#handlePatch(data);
+        break;
+
+      case UpdateType.MINOR:
+        console.log(updateType, data);
+        break;
+
+      case UpdateType.MAJOR:
+        console.log(updateType, data);
+        break;
+
+      case UpdateType.INIT:
+        console.log(updateType, data);
+        break;
+    }
+  }
+
+  #handlePatch(data) {
+    this.#updateCard(data);
+    this.#updateModal(data);
+  }
+
+  #updateCard = (updatedBouquet) => {
+    if (this.#cardPresenters.has(updatedBouquet.id)) {
+      this.#cardPresenters.get(updatedBouquet.id).init(updatedBouquet);
+    }
+  }
+
+  #updateModal = (updatedBouquet) => {
     if (this.#modalPresenter && this.#selectedBouquet.id === updatedBouquet.id) {
       this.#selectedBouquet = updatedBouquet;
-      this.#deferredModel.toggleFavorite(updatedBouquet);
+      this.#modalPresenter.updateDeferredStatus();
     }
   }
 
@@ -173,7 +220,7 @@ export default class CataloguePresenter {
     const cardPresenter = new CardPresenter(
       container,
       this.#deferredModel,
-      this.#handleCardDeferredToggle,
+      this.#handleViewAction,
       this.#handleOpenModal
     );
 
@@ -213,7 +260,7 @@ export default class CataloguePresenter {
       this.#modalPresenter = new ModalPresenter(
         this.#bodyContainer,
         this.#deferredModel,
-        this.#handleModalDeferredToggle,
+        this.#handleViewAction,
         this.#handleCloseModal
       );
     }
