@@ -50,6 +50,10 @@ export default class ModalPresenter {
     );
   }
 
+  modalElement() {
+    return this.#modalComponent.element;
+  }
+
   updateDeferredStatus() {
     const isDeferred = this.#deferredModel.has(this.#bouquet.id);
     this.#modalComponent.updateDeferredStatus(isDeferred);

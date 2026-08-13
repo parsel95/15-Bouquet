@@ -2,7 +2,7 @@ import CardView from '../view/card/card-view.js';
 import {render, remove, replace} from '../framework/render.js';
 import {UserAction, UpdateType} from '../const.js';
 
-export default class CardPresenter {
+export default class CatalogueCardPresenter {
   #cardComponent = null;
 
   #container = null;

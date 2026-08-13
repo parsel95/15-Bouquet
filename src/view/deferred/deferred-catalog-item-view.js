@@ -14,14 +14,14 @@ const createDeferredCatalogItemTemplate = ({title, description, price, previewIm
         </div>
 
         <div class="deferred-card__count">
-          <button class="btn-calculate" type="button">
+          <button class="btn-calculate btn-calculate--minus" type="button">
             <svg width="30" height="27" aria-hidden="true">
               <use xlink:href="#icon-minus"></use>
             </svg>
 
           </button><span>${count}</span>
 
-          <button class="btn-calculate" type="button">
+          <button class="btn-calculate btn-calculate--plus" type="button">
             <svg width="30" height="28" aria-hidden="true">
               <use xlink:href="#icon-cross"></use>
             </svg>
@@ -57,5 +57,38 @@ export default class DeferredCatalogItemView extends AbstractView {
 
   get template() {
     return createDeferredCatalogItemTemplate(this.#bouquet, this.#count);
+  }
+
+  setDecrementClickHandler = (callback) => {
+    this._callback.decrementClick = callback;
+
+    this.element.querySelector('.btn-calculate--minus').addEventListener('click', this.#decrementClickHandler);
+  }
+
+  setIncrementClickHandler = (callback) => {
+    this._callback.incrementClick = callback;
+
+    this.element.querySelector('.btn-calculate--plus').addEventListener('click', this.#incrementClickHandler);
+  }
+
+  setCloseBtnClickHandler = (callback) => {
+    this._callback.closeBtnClick = callback;
+
+    this.element.querySelector('.btn-close').addEventListener('click', this.#closeBtnClick);
+  }
+
+  #decrementClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.decrementClick();
+  }
+
+  #incrementClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.incrementClick();
+  }
+
+  #closeBtnClick = (evt) => {
+    evt.preventDefault();
+    this._callback.closeBtnClick();
   }
 }

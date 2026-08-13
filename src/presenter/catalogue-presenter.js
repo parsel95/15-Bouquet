@@ -5,10 +5,11 @@ import CatalogueEmptyListView from '../view/catalogue/catalogue-empty-list.js';
 import LoadMoreButtonView from '../view/catalogue/catalogue-load-more-button-view.js';
 import ScrollToTopButtonView from '../view/catalogue/catalogue-scroll-to-top-button-view.js';
 
-import CardPresenter from './card-presenter.js';
+import CatalogueCardPresenter from './catalogue-card-presenter.js';
 import ModalPresenter from './modal-presenter.js';
 
 import {render, RenderPosition, remove, replace} from '../framework/render.js';
+import {setToZeroOpacity, setToFullOpacity} from '../utils/animation.js';
 import {sortBouquetsByPriceUp, sortBouquetsByPriceDown} from '../utils/common.js';
 import ScrollLock from '../utils/scroll-lock.js';
 import {SortType, UserAction, UpdateType} from '../const.js';
@@ -43,6 +44,7 @@ export default class CataloguePresenter {
     this.#mainContainer = mainContainer;
     this.#bouquetsModel = bouquetsModel;
     this.#deferredModel = deferredModel;
+
     this.#deferredModel.addObserver(this.#handleModelEvent);
   }
 
@@ -89,13 +91,13 @@ export default class CataloguePresenter {
         break;
 
       case UserAction.DELETE_BOUQUET:
-        console.log(actionType, updateType, update);
+        console.log(actionType, updateType, updateBouquet);
         break;
     }
   }
 
   #handleUpdateBouquet(updateType, updatedBouquet) {
-    this.#deferredModel.toggleFavorite(updatedBouquet, updateType);
+    this.#deferredModel.toggleFavorite(updateType, updatedBouquet);
   }
 
   #handleModelEvent = (updateType, data) => {
@@ -105,15 +107,12 @@ export default class CataloguePresenter {
         break;
 
       case UpdateType.MINOR:
-        console.log(updateType, data);
         break;
 
       case UpdateType.MAJOR:
-        console.log(updateType, data);
         break;
 
       case UpdateType.INIT:
-        console.log(updateType, data);
         break;
     }
   }
@@ -217,7 +216,7 @@ export default class CataloguePresenter {
   }
 
   #renderCard(bouquet, container) {
-    const cardPresenter = new CardPresenter(
+    const cardPresenter = new CatalogueCardPresenter(
       container,
       this.#deferredModel,
       this.#handleViewAction,
@@ -229,7 +228,7 @@ export default class CataloguePresenter {
     this.#cardPresenters.set(bouquet.id, cardPresenter);
   }
 
-  #handleOpenModal = (bouquet) => {
+  #handleOpenModal = (bouquet, time = 10) => {
     if (this.#selectedBouquet && this.#selectedBouquet.id === bouquet.id) {
       return;
     }
@@ -244,15 +243,25 @@ export default class CataloguePresenter {
     this.#scrollLock.disableScrolling();
 
     document.addEventListener('keydown', this.#onEscKeyDown);
+
+    setTimeout(() => {
+      setToFullOpacity(this.#modalPresenter.modalElement());
+    }, time);
   }
 
-  #handleCloseModal = () => {
-    this.#modalPresenter.destroy();
-    this.#modalPresenter = null;
-    this.#selectedBouquet = null;
-    this.#scrollLock.enableScrolling();
+  #handleCloseModal = (time = 500) => {
+    setToZeroOpacity(this.#modalPresenter.modalElement(), 0.5);
 
-    document.removeEventListener('keydown', this.#onEscKeyDown);
+    setTimeout(() => {
+      this.#modalPresenter.destroy();
+      this.#modalPresenter = null;
+      this.#selectedBouquet = null;
+      this.#scrollLock.enableScrolling();
+
+      document.removeEventListener('keydown', this.#onEscKeyDown);
+
+      setToFullOpacity(this.#catalogueComponent.element);
+    }, time);
   }
 
   #renderModal() {

@@ -1,6 +1,6 @@
 import HeaderCountView from '../view/header/header-count-view.js';
 
-import {render} from '../framework/render.js';
+import {render, remove, replace} from '../framework/render.js';
 
 export default class HeaderCountPresenter {
   #headerCountComponent = null;
@@ -18,6 +18,8 @@ export default class HeaderCountPresenter {
     this.#bouquetsModel = bouquetsModel;
     this.#deferredModel = deferredModel;
     this.#handleOpenDeferred = handleOpenDeferred;
+
+    this.#deferredModel.addObserver(this.#handleModelEvent);
   }
 
   get deferred() {
@@ -28,10 +30,21 @@ export default class HeaderCountPresenter {
     this.#renderHeaderCount();
   }
 
-  #renderHeaderCount() {
-    this.#headerCountComponent = new HeaderCountView(this.deferred);
+  #handleModelEvent = () => {
+    const prevComponent = this.#headerCountComponent;
 
-    render(this.#headerCountComponent, this.#container);
+    this.#headerCountComponent = new HeaderCountView(this.deferred);
     this.#headerCountComponent.setClickHandler(this.#handleOpenDeferred);
+
+    replace(this.#headerCountComponent, prevComponent);
+    remove(prevComponent);
+  }
+
+  #renderHeaderCount() {
+    if (!this.#headerCountComponent) {
+      this.#headerCountComponent = new HeaderCountView(this.deferred);
+      render(this.#headerCountComponent, this.#container);
+      this.#headerCountComponent.setClickHandler(this.#handleOpenDeferred);
+    }
   }
 }

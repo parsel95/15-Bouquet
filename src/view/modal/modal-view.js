@@ -4,7 +4,7 @@ import ImageSlider from '../../utils/image-slider.js';
 
 const createModalViewTemplate = ({title, description, price, authorPhoto, images}, isDeferred) =>
   `
-    <div class="modal modal--product product-card-active is-active" data-modal="product-card">
+    <div class="modal modal--product product-card-active is-active" data-modal="product-card" style= "opacity: 0">
       <div class="modal__wrapper">
         <div class="modal__overlay" data-close-modal=""></div>
 
