@@ -11,7 +11,6 @@ import DeferredCardPresenter from './deferred-card-presenter.js';
 
 import {render, RenderPosition, remove} from '../framework/render.js';
 import {setToZeroOpacity, setToFullOpacity} from '../utils/animation.js';
-import {bouquets} from '../mock/bouquets.js';
 import {UserAction, UpdateType} from '../const.js';
 
 export default class DeferredPresenter {

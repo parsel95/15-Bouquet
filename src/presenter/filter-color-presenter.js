@@ -1,4 +1,4 @@
-import FilterColorView from '../view/filter-color/filter-color-view';
+import FilterColorView from '../view/filter-color/filter-color-view.js';
 import {render, remove, replace} from '../framework/render.js';
 import {ColorType, ColorTypeText, UpdateType} from '../const.js';
 

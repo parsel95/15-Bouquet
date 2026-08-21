@@ -46,10 +46,6 @@ export default class FilterReasonPresenter {
   }
 
   #filterTypeChangeHandler = (filterType) => {
-    if (this.#filterModel.reasonFilter === filterType) {
-      return;
-    }
-
     this.#filterModel.setReasonFilter(UpdateType.MINOR, filterType);
   }
 

@@ -10,10 +10,14 @@ export default class FilterModel extends Observable {
   }
 
   get colorFilters() {
-    return this.#colorFilters;
+    return [...this.#colorFilters];
   }
 
   setReasonFilter = (updateType, reasonFilter) => {
+    if (this.#reasonFilter === reasonFilter) {
+      return;
+    }
+
     this.#reasonFilter = reasonFilter;
     this._notify(updateType, reasonFilter);
   }
