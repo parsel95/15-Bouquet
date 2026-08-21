@@ -17,17 +17,17 @@ const DESCRIPTIONS = [
 ];
 
 const TYPES = [
-  'birthdayboy',
-  'bridge',
-  'motherday',
-  'forlove',
-  'colleagues',
+  'birthday',
+  'bride',
+  'mother',
+  'darling',
+  'colleague',
 ];
 
 const COLORS = [
   'red',
   'white',
-  'purple',
+  'lilac',
   'pink',
   'yellow',
 ];

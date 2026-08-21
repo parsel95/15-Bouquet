@@ -21,18 +21,27 @@ const createFilterColorTemplate = (filters, currentColor, text) => {
 
 export default class FilterColorView extends AbstractView {
   #filters = null;
-  #currentColor = null;
+  #currentColors = null;
   #text = null;
 
-  constructor(filters, currentColor, text) {
+  constructor(filters, currentColors, text) {
     super();
     this.#filters = filters;
-    this.#currentColor = currentColor;
+    this.#currentColors = currentColors;
     this.#text = text;
   }
 
   get template() {
-    return createFilterColorTemplate(this.#filters, this.#currentColor, this.#text);
+    return createFilterColorTemplate(this.#filters, this.#currentColors, this.#text);
+  }
+
+  setFilterTypeChangeHandler(callback) {
+    this._callback.filterTypeChange = callback;
+    this.element.addEventListener('change', this.#filterTypeChangeHandler);
+  }
+
+  #filterTypeChangeHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.filterTypeChange(evt.target.dataset.filterColor);
   }
 }
-

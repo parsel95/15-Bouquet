@@ -34,5 +34,15 @@ export default class FilterReasonView extends AbstractView {
   get template() {
     return createFilterReasonTemplate(this.#filters, this.#currentReason, this.#text);
   }
+
+  setFilterTypeChangeHandler(callback) {
+    this._callback.filterTypeChange = callback;
+    this.element.addEventListener('change', this.#filterTypeChangeHandler);
+  }
+
+  #filterTypeChangeHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.filterTypeChange(evt.target.dataset.filterReason);
+  }
 }
 

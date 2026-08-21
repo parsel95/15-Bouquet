@@ -1,4 +1,4 @@
-export const createFilterColorItemTemplate = (currentType, type, text, index) =>
+export const createFilterColorItemTemplate = (currentColors, type, text, index) =>
   `
    <div class="filter-field-img filter-color__form-field">
       <input
@@ -10,8 +10,8 @@ export const createFilterColorItemTemplate = (currentType, type, text, index) =>
         id="filter-colors-field-id-${index}"
         name="colors"
         value="color-${type}"
-        ${currentType === type ? 'checked' : ''}
-        data-filter-color="color-${type}"
+        ${currentColors.includes(type) ? 'checked' : ''}
+        data-filter-color="${type}"
       >
 
       <label class="filter-field-img__label" for="filter-colors-field-id-${index}">

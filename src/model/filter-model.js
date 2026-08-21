@@ -1,27 +1,58 @@
+import Observable from '../framework/observable.js';
 import {ReasonType, ColorType} from '../const.js';
 
-export default class FilterModel {
-  #reason = ReasonType.ALL;
-  #color = ColorType.ALL;
+export default class FilterModel extends Observable {
+  #reasonFilter = ReasonType.ALL;
+  #colorFilters = [ColorType.ALL];
 
-  constructor() {
-    this.#reason = ReasonType.ALL;
-    this.#color = ColorType.ALL;
+  get reasonFilter() {
+    return this.#reasonFilter;
   }
 
-  get reason() {
-    return this.#reason;
+  get colorFilters() {
+    return this.#colorFilters;
   }
 
-  get color() {
-    return this.#color;
+  setReasonFilter = (updateType, reasonFilter) => {
+    this.#reasonFilter = reasonFilter;
+    this._notify(updateType, reasonFilter);
   }
 
-  setReason(reason) {
-    this.#reason = reason;
+  #addColorFilter = (colorFilter) => {
+    this.#colorFilters.push(colorFilter);
   }
 
-  setColor(color) {
-    this.#color = color;
+  #deleteColorFilter = (colorFilter) => {
+    this.#colorFilters = this.#colorFilters.filter((filter) => filter !== colorFilter);
+  }
+
+  toggleColorFilter = (updateType, colorFilter) => {
+    if (colorFilter === ColorType.ALL) {
+      if (!this.#colorFilters.includes(ColorType.ALL)) {
+        this.#colorFilters = [ColorType.ALL];
+      }
+
+      this._notify(updateType, colorFilter);
+      return;
+    }
+
+    if (this.#colorFilters.includes(ColorType.ALL)) {
+      this.#deleteColorFilter(ColorType.ALL);
+    }
+
+    this.#toggleColorInSelection(colorFilter);
+    this._notify(updateType, colorFilter);
+  }
+
+  #toggleColorInSelection = (colorFilter) => {
+    if (!this.#colorFilters.includes(colorFilter)) {
+      this.#addColorFilter(colorFilter);
+    } else {
+      this.#deleteColorFilter(colorFilter);
+    }
+
+    if (this.#colorFilters.length === 0) {
+      this.#addColorFilter(ColorType.ALL);
+    }
   }
 }

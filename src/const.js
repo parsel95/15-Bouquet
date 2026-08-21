@@ -4,7 +4,7 @@ const ReasonType = {
   BRIDE: 'bride',
   MOTHER: 'mother',
   COLLEAGUE: 'colleague',
-  DARLING: 'darling'
+  DARLING: 'darling',
 }
 
 const ReasonTypeText = {
@@ -13,7 +13,7 @@ const ReasonTypeText = {
   [ReasonType.BRIDE]: 'Невесте',
   [ReasonType.MOTHER]: 'Маме',
   [ReasonType.COLLEAGUE]: 'Коллеге',
-  [ReasonType.DARLING]: 'Любимой'
+  [ReasonType.DARLING]: 'Любимой',
 }
 
 const ColorType = {
@@ -31,15 +31,15 @@ const ColorTypeText = {
   [ColorType.WHITE]: 'белый',
   [ColorType.LILAC]: 'сиреневый',
   [ColorType.YELLOW]: 'жёлтый',
-  [ColorType.PINK]: 'розовый'
+  [ColorType.PINK]: 'розовый',
 }
 
 const LabelType = {
-  birthdayboy: "имениннику",
-  forlove: "любимой",
-  bridge: "невесте",
-  colleagues: "коллеге",
-  motherday: "маме",
+  birthday: "имениннику",
+  darling: "любимой",
+  bride: "невесте",
+  colleague: "коллеге",
+  mother: "маме",
 };
 
 const LogoConfig = {

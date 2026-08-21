@@ -13,6 +13,7 @@ import {setToZeroOpacity, setToFullOpacity} from '../utils/animation.js';
 import {sortBouquetsByPriceUp, sortBouquetsByPriceDown} from '../utils/common.js';
 import ScrollLock from '../utils/scroll-lock.js';
 import {SortType, UserAction, UpdateType} from '../const.js';
+import {filterReason, filterColor} from '../utils/filter.js';
 
 const BOUQUET_COUNT_PER_STEP = 6;
 
@@ -28,6 +29,7 @@ export default class CataloguePresenter {
   #mainContainer = null;
   #bouquetsModel = null;
   #deferredModel = null;
+  #filterModel = null;
 
   #cardPresenters = new Map();
   #modalPresenter = null;
@@ -39,24 +41,35 @@ export default class CataloguePresenter {
 
   #scrollLock = new ScrollLock();
 
-  constructor(bodyContainer, mainContainer, bouquetsModel, deferredModel) {
+  constructor(bodyContainer, mainContainer, bouquetsModel, deferredModel, filterModel) {
     this.#bodyContainer = bodyContainer;
     this.#mainContainer = mainContainer;
     this.#bouquetsModel = bouquetsModel;
     this.#deferredModel = deferredModel;
+    this.#filterModel = filterModel;
 
     this.#deferredModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   get bouquets() {
+    const filterReasonType = this.#filterModel.reasonFilter;
+    const filterColorTypes = this.#filterModel.colorFilters;
     const bouquets = this.#bouquetsModel.get();
+
+    const filteredByReasonBouquets = filterReason[filterReasonType](bouquets);
+    const filteredByColorBouquets = filterColorTypes.flatMap(
+      (filter) => filterColor[filter](filteredByReasonBouquets)
+    );
 
     switch (this.#currentSortType) {
       case SortType.PRICE_UP:
-        return [...bouquets].sort(sortBouquetsByPriceUp);
+        return [...filteredByColorBouquets].sort(sortBouquetsByPriceUp);
       case SortType.PRICE_DOWN:
-        return [...bouquets].sort(sortBouquetsByPriceDown);
+        return [...filteredByColorBouquets].sort(sortBouquetsByPriceDown);
     }
+
+    return filteredByColorBouquets;
   }
 
   get deferred() {
@@ -107,6 +120,7 @@ export default class CataloguePresenter {
         break;
 
       case UpdateType.MINOR:
+        this.#handleMinor();
         break;
 
       case UpdateType.MAJOR:
@@ -133,6 +147,11 @@ export default class CataloguePresenter {
       this.#selectedBouquet = updatedBouquet;
       this.#modalPresenter.updateDeferredStatus();
     }
+  }
+
+  #handleMinor() {
+    this.#clearCatalogueList();
+    this.#renderCatalogue(true);
   }
 
   #renderLoadMoreButton(container) {
@@ -283,17 +302,19 @@ export default class CataloguePresenter {
     this.#renderScrollToTopButton(container);
   }
 
-  #renderCatalogue() {
+  #renderCatalogue(sorting = false) {
     const renderCount = this.#savedRenderedBouquetsCount ?? BOUQUET_COUNT_PER_STEP;
     const bouquets = this.bouquets.slice(0, renderCount);
     const buttonsContainer = this.#catalogueComponent.getButtonsContainer();
 
-    render(this.#catalogueComponent, this.#mainContainer);
-    this.#renderSorting(this.#catalogueComponent.getSortingContainer());
-
     if (bouquets.length === 0) {
       this.#renderEmptyCatalogue(buttonsContainer);
       return;
+    }
+
+    if (!sorting) {
+      render(this.#catalogueComponent, this.#mainContainer);
+      this.#renderSorting(this.#catalogueComponent.getSortingContainer());
     }
 
     this.#renderCatalogueList(bouquets, buttonsContainer);

@@ -18,6 +18,7 @@ export const createFilterReasonItemTemplate = (currentType, type, text, index) =
         name="reason"
         value="for-${type}"
         ${currentType === type ? 'checked' : ''}
+        data-filter-reason="${type}"
       >
 
       <label

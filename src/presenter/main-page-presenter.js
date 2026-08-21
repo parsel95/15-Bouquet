@@ -8,7 +8,6 @@ import FilterColorPresenter from './filter-color-presenter.js';
 import DeferredPresenter from './deferred-presenter.js';
 
 import {render, remove} from '../framework/render.js';
-import {ReasonType, ColorType} from '../const.js';
 
 export default class MainPagePresenter {
   #heroComponent = new HeroView();
@@ -60,7 +59,7 @@ export default class MainPagePresenter {
   }
 
   #renderCatalogue(savedCount) {
-    this.#cataloguePresenter = new CataloguePresenter(this.#bodyContainer, this.#mainContainer, this.#bouquetsModel, this.#deferredModel);
+    this.#cataloguePresenter = new CataloguePresenter(this.#bodyContainer, this.#mainContainer, this.#bouquetsModel, this.#deferredModel, this.#filterModel);
     this.#cataloguePresenter.init(savedCount);
   }
 
