@@ -29,7 +29,7 @@ const createDeferredCatalogItemTemplate = ({title, description, price, previewIm
         </div>
 
         <div class="deferred-card__price">
-          <b class="price price--size-middle-p">${price}<span>Р</span></b>
+          <b class="price price--size-middle-p">${price * count}<span>Р</span></b>
         </div>
 
         <button class="btn-close deferred-card__close-btn" type="button">

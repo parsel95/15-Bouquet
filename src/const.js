@@ -75,6 +75,12 @@ const UpdateType = {
   INIT: 'INIT'
 }
 
+const Method = {
+  GET: 'GET',
+  PUT: 'PUT',
+  DELETE: 'DELETE',
+};
+
 export {
   ReasonType,
   ReasonTypeText,
@@ -86,5 +92,6 @@ export {
   Page,
   SortType,
   UserAction,
-  UpdateType
+  UpdateType,
+  Method
 };

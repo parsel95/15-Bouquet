@@ -59,7 +59,13 @@ export default class MainPagePresenter {
   }
 
   #renderCatalogue(savedCount) {
-    this.#cataloguePresenter = new CataloguePresenter(this.#bodyContainer, this.#mainContainer, this.#bouquetsModel, this.#deferredModel, this.#filterModel);
+    this.#cataloguePresenter = new CataloguePresenter(
+      this.#bodyContainer,
+      this.#mainContainer,
+      this.#bouquetsModel,
+      this.#deferredModel,
+      this.#filterModel
+    );
     this.#cataloguePresenter.init(savedCount);
   }
 

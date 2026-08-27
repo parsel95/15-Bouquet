@@ -10,7 +10,9 @@ const createHeaderCountViewTemplate = ({productCount, sum}) =>
         <span class="visually-hidden">закрыть</span>
       </button>
       <div class="header-count__count">
-        <p class="text text--size-20 header-count__counter">${productCount}</p>
+        <p class="text text--size-20 header-count__counter">
+        ${productCount}
+        </p>
       </div>
       <div class="header-count__block">
         <p class="text text--size-20 header-count__text">сумма</p>
@@ -24,7 +26,7 @@ const createHeaderCountViewTemplate = ({productCount, sum}) =>
 
 export default class HeaderCountView extends AbstractView {
   #deferred = null;
-
+ 
   constructor(deferred) {
     super();
     this.#deferred = deferred;

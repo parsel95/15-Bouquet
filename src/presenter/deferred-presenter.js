@@ -9,7 +9,7 @@ import DeferredSumView from '../view/deferred/deferred-sum-view.js';
 
 import DeferredCardPresenter from './deferred-card-presenter.js';
 
-import {render, RenderPosition, remove} from '../framework/render.js';
+import {render, RenderPosition, remove, replace} from '../framework/render.js';
 import {setToZeroOpacity, setToFullOpacity} from '../utils/animation.js';
 import {UserAction, UpdateType} from '../const.js';
 
@@ -67,21 +67,18 @@ export default class DeferredPresenter {
       this.#renderDeferredEmptyList();
       return;
     }
-    console.log(this.deferred);
 
     Object.entries(deferred.products).forEach(([id, count]) => {
       const bouquet = bouquets.find((item) => item.id == id);
 
-
       setTimeout(() => {
         this.#renderDeferredItem(bouquet, count);
       }, time);
-
     })
   }
 
   #clearDeferredItems(time = 500) {
-    if (this.deferred.products.length === 0) {
+    if (Object.keys(this.deferred.products).length === 0) {
       window.scrollTo(0, this.#deferredBackButtonComponent.element.offsetTop);
     }
 
@@ -90,7 +87,7 @@ export default class DeferredPresenter {
     setTimeout(() => {
       this.#cardPresenters.forEach((presenter) => presenter.destroy());
       this.#cardPresenters.clear();
-      if (this.deferred.products.length === 0) {
+      if (Object.keys(this.deferred.products).length === 0) {
         this.#renderDeferredEmptyList();
       }
       setToFullOpacity(this.#deferredCatalogComponent.element);
@@ -118,8 +115,8 @@ export default class DeferredPresenter {
       case UserAction.INCREMENT_BOUQUET:
         this.#handleIncrementBouquet(updateType, updateBouquet);
         break;
-      case UserAction.DECREMENT_BOUQUET:
-        this.#handleDecrementBouquet(updateType, updateBouquet);
+      case UserAction.DELETE_CARD_BOUQUET:
+        this.#handleDeleteCardBouquet(updateType, updateBouquet);
         break;
       case UserAction.DELETE_BOUQUET:
         this.#handleDeleteBouquet(updateType, updateBouquet);
@@ -133,11 +130,11 @@ export default class DeferredPresenter {
   }
 
   #handleIncrementBouquet = (updateType, updateBouquet) => {
-    this.#deferredModel.increment(updateType, updateBouquet);
+    this.#deferredModel.add(updateType, updateBouquet);
   }
 
-  #handleDecrementBouquet = (updateType, updateBouquet) => {
-    this.#deferredModel.decrement(updateType, updateBouquet);
+  #handleDeleteCardBouquet = (updateType, updateBouquet) => {
+    this.#deferredModel.deleteCard(updateType, updateBouquet);
   }
 
   #handleDeleteBouquet = (updateType, updateBouquet) => {
@@ -156,9 +153,6 @@ export default class DeferredPresenter {
       case UpdateType.MINOR:
         this.#handleMinor();
         break;
-      case UpdateType.MAJOR:
-        console.log(updateType, data);
-        break;
       case UpdateType.INIT:
         console.log(updateType, data);
         break;
@@ -170,17 +164,31 @@ export default class DeferredPresenter {
       const count = this.deferred.products[data.id];
 
       this.#cardPresenters.get(data.id).init(data, count);
+      this.#updateSumComponent();
     }
   }
 
   #handleMinor = () => {
     this.#clearDeferredItems();
     this.#renderDeferredItems();
+    this.#updateSumComponent();
+  }
+
+  #renderDeferredSum() {
+    this.#deferredSumComponent = new DeferredSumView(this.deferred);
+    render(this.#deferredSumComponent, this.#deferredComponent.getDeferredContainer());
+  }
+
+  #updateSumComponent = () => {
+    const prevComponent = this.#deferredSumComponent;
+
+    this.#deferredSumComponent = new DeferredSumView(this.deferred);
+
+    replace(this.#deferredSumComponent, prevComponent);
+    remove(prevComponent);
   }
 
   #renderDeferredContent() {
-    this.#deferredSumComponent = new DeferredSumView(this.deferred);
-
     render(this.#deferredBackButtonComponent, this.#deferredComponent.getDeferredContainer());
     this.#deferredBackButtonComponent.setClickHandler(this.#handleCloseDeferred);
     render(this.#deferredCatalogComponent, this.#deferredComponent.getDeferredContainer());
@@ -190,8 +198,9 @@ export default class DeferredPresenter {
     this.#deferredCleanButtonComponent.setClickHandler(() => {
       this.#handleViewAction(UserAction.CLEAN_ALL_BOUQUETS, UpdateType.MINOR);
     });
-    render(this.#deferredSumComponent, this.#deferredComponent.getDeferredContainer());
+    this.#renderDeferredSum();
   }
+
 
   #renderDeferredPage() {
     render(this.#deferredComponent, this.#container);

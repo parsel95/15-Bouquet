@@ -41,13 +41,13 @@ export default class DeferredCardPresenter {
   #handleDecrementClick = (count) => {
     if (count === 1) {
       this.#changeData(
-        UserAction.DECREMENT_BOUQUET,
+        UserAction.DELETE_BOUQUET,
         UpdateType.MINOR,
         {...this.#bouquet}
       );
     } else {
       this.#changeData(
-        UserAction.DECREMENT_BOUQUET,
+        UserAction.DELETE_BOUQUET,
         UpdateType.PATCH,
         {...this.#bouquet}
       );
@@ -64,7 +64,7 @@ export default class DeferredCardPresenter {
 
   #handleCloseBtnClick = () => {
     this.#changeData(
-      UserAction.DELETE_BOUQUET,
+      UserAction.DELETE_CARD_BOUQUET,
       UpdateType.MINOR,
       {...this.#bouquet}
     );
