@@ -74,7 +74,7 @@ export default class AppPresenter {
     this.#logoFooterComponent.setClickHandler(() => this.#switchPage(Page.MAIN));
   }
 
-  #switchPage = (targetPage, shouldRestore = false, time = 500) => {
+  #switchPage = (targetPage, shouldRestore = false, time = 400) => {
     if (this.#mainPagePresenter) {
       this.#mainScrollPosition = window.scrollY;
       this.#renderedBouquetsCount = this.#mainPagePresenter.getBouquetsCount();

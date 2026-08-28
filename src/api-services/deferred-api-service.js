@@ -13,7 +13,7 @@ export default class DeferredApiService extends ApiService {
     });
 
     const parsedResponse = await ApiService.parseResponse(response);
-    // console.log(parsedResponse)
+
     return parsedResponse;
   }
 

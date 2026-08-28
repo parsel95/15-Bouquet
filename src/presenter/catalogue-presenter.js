@@ -113,7 +113,7 @@ export default class CataloguePresenter {
   }
 
   #handleUpdateBouquet(updateType, updatedBouquet) {
-    this.#deferredModel.toggleFavorite(updateType, updatedBouquet);
+    this.#deferredModel.toggleDeferred(updateType, updatedBouquet);
   }
 
   #handleBouquetsModelEvent = (updateType) => {
@@ -344,7 +344,6 @@ export default class CataloguePresenter {
       this.#renderEmptyCatalogue(buttonsContainer);
       return;
     }
-
 
     this.#renderCatalogueList(bouquets, buttonsContainer);
   }

@@ -37,85 +37,138 @@ export default class DeferredModel extends Observable {
     return Object.hasOwn(this.#deferred.products, bouquetId);
   }
 
-  decrement = (updateType, bouquet) => {
-    if (this.#deferredBouquets.products[bouquet.id] > 1) {
-      this.#deferredBouquets.products[bouquet.id]--;
+  #increment(updateType, bouquet, action = 'add') {
+    if (action === 'add') {
+      if (this.#deferred.products[bouquet.id]) {
+        this.#deferred.products[bouquet.id]++;
+      } else {
+        this.#deferred.products[bouquet.id] = 1;
+      }
+
+      this.#deferred.productCount++;
+      this.#deferred.sum += bouquet.price;
+
+      this._notify(updateType, bouquet);
     } else {
-      delete this.#deferredBouquets.products[bouquet.id];
-    }
+      this.#deferred.products[bouquet.id]--;
 
-    this._notify(updateType, bouquet);
+      if (this.#deferred.products[bouquet.id] === 0) {
+        delete this.#deferred.products[bouquet.id];
+      }
+
+      this.#deferred.productCount--;
+      this.#deferred.sum -= bouquet.price;
+
+      this._notify(updateType, bouquet);
+    }
   }
 
-  cleanAll = async (updateType) => {
-    const bouquetIds = Object.keys(this.#deferred.products);
+  #decrement(updateType, bouquet, action = 'delete') {
+    if (action === 'delete') {
+      if (this.#deferred.products[bouquet.id] > 1) {
+        this.#deferred.products[bouquet.id]--;
+      } else {
+        delete this.#deferred.products[bouquet.id];
+      }
 
-    await Promise.all(
-      bouquetIds.map(async (bouquetId) => {
-        const quantity = this.#deferred.products[bouquetId];
+      this.#deferred.productCount--;
+      this.#deferred.sum -= bouquet.price;
 
-        for (let i = 0; i < quantity; i++) {
-          await this.#apiService.delete(bouquetId);
-        }
-      })
-    );
+      this._notify(updateType, bouquet);
+    } else {
 
-    this.#deferred = await this.#apiService.get();
+      if (this.#deferred.products[bouquet.id] === 0) {
+        this.#deferred.products[bouquet.id] = 1;
+      } else {
+        this.#deferred.products[bouquet.id]++;
+      }
 
-    this._notify(updateType);
-  }
+      this.#deferred.productCount++;
+      this.#deferred.sum += bouquet.price;
 
-  deleteCard = async (updateType, bouquet) => {
-    const deleteRequests = [];
-
-    for (let i = 0; i < this.#deferred.products[bouquet.id]; i++) {
-      deleteRequests.push(
-        this.#apiService.delete(bouquet.id)
-      );
+      this._notify(updateType, bouquet);
     }
-
-    await Promise.all(deleteRequests);
-
-    this.#deferred = await this.#apiService.get();
-
-    this._notify(updateType);
   }
 
   add = async (updateType, bouquet) => {
-     console.time('ADD');
-    const addedBouquet = await this.#apiService.add(bouquet);
-console.timeLog('ADD', 'сервер ответил');
-  if (this.#deferred.products[addedBouquet.id]) {
-    this.#deferred.products[addedBouquet.id]++;
-  } else {
-    this.#deferred.products[addedBouquet.id] = 1;
-  }
+    this.#increment(updateType, bouquet);
 
-  this.#deferred.productCount++;
-  this.#deferred.sum += addedBouquet.price;
-    // try {
-    //   await this.#apiService.add(bouquet);
-    //   // this.#deferred = await this.#apiService.get();
-    // } catch {
-    //   throw new Error('Can\'t delete bouquet');
-    // }
+    try {
+      await this.#apiService.add(bouquet);
+    } catch {
+      this.#increment(updateType, bouquet, 'delete');
 
-    this._notify(updateType, bouquet);
-    console.timeLog('ADD', 'notify закончен');
-  console.timeEnd('ADD');
+      throw new Error('Can\'t add bouquet');
+    }
   }
 
   delete = async (updateType, bouquet) => {
-    await this.#apiService.delete(bouquet.id);
-    this.#deferred = await this.#apiService.get();
-    this._notify(updateType, bouquet);
+    this.#decrement(updateType, bouquet);
+
+    try {
+      await this.#apiService.delete(bouquet.id);
+    } catch {
+      this.#decrement(updateType, bouquet, 'add');
+
+      throw new Error('Can\'t delete bouquet');
+    }
   }
 
-  toggleFavorite = (updateType, bouquet) => {
-    if (this.has(bouquet.id)) {
-      this.delete(updateType, bouquet);
-    } else {
-      this.add(updateType, bouquet);
+  cleanAll = async (updateType) => {
+    const savedDeferred = this.#deferred;
+
+    this.#deferred = deferred;
+    this._notify(updateType);
+
+    try {
+      const bouquetIds = Object.keys(savedDeferred.products);
+
+      await Promise.all(
+        bouquetIds.map(async (bouquetId) => {
+          const quantity = savedDeferred.products[bouquetId];
+
+          for (let i = 0; i < quantity; i++) {
+            await this.#apiService.delete(bouquetId);
+          }
+        })
+      );
+    } catch {
+      this.#deferred = savedDeferred;
+      this._notify(updateType);
+
+      throw new Error('Can\'t delete all bouquets');
     }
+  }
+
+  deleteCard = async (updateType, bouquet) => {
+    const savedCount = this.#deferred.products[bouquet.id];
+
+    delete this.#deferred.products[bouquet.id];
+    this._notify(updateType);
+
+    try {
+      const deleteRequests = [];
+
+      for (let i = 0; i < this.#deferred.products[bouquet.id]; i++) {
+        deleteRequests.push(
+          this.#apiService.delete(bouquet.id)
+        );
+      }
+
+      await Promise.all(deleteRequests);
+    } catch {
+      this.#deferred.products[bouquet.id] = savedCount;
+      this._notify(updateType);
+
+      throw new Error('Can\'t this card');
+    }
+  }
+
+  toggleDeferred = (updateType, bouquet) => {
+    if (this.has(bouquet.id)) {
+      return this.delete(updateType, bouquet);
+    }
+
+    return this.add(updateType, bouquet);
   }
 }

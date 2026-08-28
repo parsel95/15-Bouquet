@@ -4766,9 +4766,9 @@ button,
           align-items: flex-end;
 }
 .item-card.is-favorite .item-card__to-fav-btn .button-heart__body {
-  -webkit-transition: fill 0.3s ease;
+  /* -webkit-transition: fill 0.3s ease;
   -o-transition: fill 0.3s ease;
-  transition: fill 0.3s ease;
+  transition: fill 0.3s ease; */
   -webkit-transform: scale(1.02);
       -ms-transform: scale(1.02);
           transform: scale(1.02);

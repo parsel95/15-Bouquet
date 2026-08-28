@@ -59,9 +59,11 @@ export default class DeferredPresenter {
     this.#heroDeferredComponent.setCloseClickHandler(this.#handleBackToMain);
   }
 
-  #renderDeferredItems(time = 500) {
+  #renderDeferredItems(time = 0) {
     const bouquets = this.bouquets;
     const deferred = this.deferred;
+
+    this.#deferredCleanButtonComponent.element.disabled = false;
 
     if (Object.keys(deferred.products).length === 0) {
       this.#renderDeferredEmptyList();
@@ -71,31 +73,22 @@ export default class DeferredPresenter {
     Object.entries(deferred.products).forEach(([id, count]) => {
       const bouquet = bouquets.find((item) => item.id == id);
 
-      setTimeout(() => {
-        this.#renderDeferredItem(bouquet, count);
-      }, time);
+      this.#renderDeferredItem(bouquet, count);
     })
   }
 
-  #clearDeferredItems(time = 500) {
+  #clearDeferredItems() {
     if (Object.keys(this.deferred.products).length === 0) {
       window.scrollTo(0, this.#deferredBackButtonComponent.element.offsetTop);
     }
 
-    setToZeroOpacity(this.#deferredCatalogComponent.element, 0.5);
-
-    setTimeout(() => {
-      this.#cardPresenters.forEach((presenter) => presenter.destroy());
-      this.#cardPresenters.clear();
-      if (Object.keys(this.deferred.products).length === 0) {
-        this.#renderDeferredEmptyList();
-      }
-      setToFullOpacity(this.#deferredCatalogComponent.element);
-    }, time);
+    this.#cardPresenters.forEach((presenter) => presenter.destroy());
+    this.#cardPresenters.clear();
   }
 
   #renderDeferredEmptyList() {
     render(this.#deferredEmptyListView, this.#deferredCatalogComponent.element);
+    this.#deferredCleanButtonComponent.element.disabled = true;
   }
 
   #renderDeferredItem(bouquet, count) {
@@ -172,6 +165,10 @@ export default class DeferredPresenter {
     this.#clearDeferredItems();
     this.#renderDeferredItems();
     this.#updateSumComponent();
+
+    if (this.#deferredEmptyListView && Object.keys(this.deferred.products).length !== 0) {
+      remove(this.#deferredEmptyListView);
+    }
   }
 
   #renderDeferredSum() {
@@ -201,7 +198,6 @@ export default class DeferredPresenter {
     this.#renderDeferredSum();
   }
 
-
   #renderDeferredPage() {
     render(this.#deferredComponent, this.#container);
     this.#renderHeroBlock();
@@ -209,11 +205,17 @@ export default class DeferredPresenter {
   }
 
   destroy() {
+    this.#deferredModel.removeObserver(this.#handleModelEvent);
+
+    this.#cardPresenters.forEach((presenter) => presenter.destroy());
+    this.#cardPresenters.clear();
+
     remove(this.#deferredComponent);
     remove(this.#heroDeferredComponent);
     remove(this.#deferredBackButtonComponent);
     remove(this.#deferredCatalogComponent);
     remove(this.#deferredCatalogItemComponent);
+    remove(this.#deferredEmptyListView);
     remove(this.#deferredCleanButtonComponent);
     remove(this.#deferredSumComponent);
   }
