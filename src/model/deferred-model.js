@@ -12,6 +12,7 @@ export default class DeferredModel extends Observable {
   #deferredBouquets = deferredBoquets;
   #deferred = deferred;
   #apiService = null;
+  #isLoaded = false;
 
   constructor(apiService) {
     super();
@@ -28,10 +29,15 @@ export default class DeferredModel extends Observable {
       console.log('DEFERRED ERROR:');
       this.#deferred = deferred;
     }
+
+    this.#isLoaded = true;
+
     this._notify(UpdateType.INIT);
   }
 
   get = () => this.#deferred;
+
+  getIsLoaded = () => this.#isLoaded;
 
   has = (bouquetId) => {
     return Object.hasOwn(this.#deferred.products, bouquetId);

@@ -92,6 +92,8 @@ export default class CataloguePresenter {
       this.#renderedBouquetsCount = BOUQUET_COUNT_PER_STEP;
     }
 
+    this.#isBouquetsLoading = !this.#bouquetsModel.getIsLoaded();
+    this.#isDeferredLoading = !this.#deferredModel.getIsLoaded();
     this.#renderCatalogue();
     this.#savedRenderedBouquetsCount = null;
   }
@@ -123,7 +125,7 @@ export default class CataloguePresenter {
   }
 
   #handleBouquetsInit() {
-    this.#isBouquetsLoading = false;
+    this.#isBouquetsLoading = !this.#bouquetsModel.getIsLoaded();
     this.#renderCatalogue();
   }
 
@@ -157,7 +159,7 @@ export default class CataloguePresenter {
   }
 
   #handleDeferredInit() {
-    this.#isDeferredLoading = false;
+    this.#isDeferredLoading = !this.#deferredModel.getIsLoaded();
     this.#renderCatalogue();
   }
 
