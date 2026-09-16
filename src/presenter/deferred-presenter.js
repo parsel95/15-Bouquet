@@ -146,9 +146,6 @@ export default class DeferredPresenter {
       case UpdateType.MINOR:
         this.#handleMinor();
         break;
-      case UpdateType.INIT:
-        console.log(updateType, data);
-        break;
     }
   }
 

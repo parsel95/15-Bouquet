@@ -53,8 +53,6 @@ export default class DeferredModel extends Observable {
 
       this.#deferred.productCount++;
       this.#deferred.sum += bouquet.price;
-
-      this._notify(updateType, bouquet);
     } else {
       this.#deferred.products[bouquet.id]--;
 
@@ -64,9 +62,9 @@ export default class DeferredModel extends Observable {
 
       this.#deferred.productCount--;
       this.#deferred.sum -= bouquet.price;
-
-      this._notify(updateType, bouquet);
     }
+
+    this._notify(updateType, bouquet);
   }
 
   #decrement(updateType, bouquet, action = 'delete') {
@@ -79,11 +77,8 @@ export default class DeferredModel extends Observable {
 
       this.#deferred.productCount--;
       this.#deferred.sum -= bouquet.price;
-
-      this._notify(updateType, bouquet);
     } else {
-
-      if (this.#deferred.products[bouquet.id] === 0) {
+      if (!this.#deferred.products[bouquet.id]) {
         this.#deferred.products[bouquet.id] = 1;
       } else {
         this.#deferred.products[bouquet.id]++;
@@ -91,9 +86,9 @@ export default class DeferredModel extends Observable {
 
       this.#deferred.productCount++;
       this.#deferred.sum += bouquet.price;
-
-      this._notify(updateType, bouquet);
     }
+
+    this._notify(updateType, bouquet);
   }
 
   add = async (updateType, bouquet) => {
@@ -122,7 +117,7 @@ export default class DeferredModel extends Observable {
 
   cleanAll = async (updateType) => {
     const savedDeferred = this.#deferred;
-
+    console.log(this.#deferred)
     this.#deferred = deferred;
     this._notify(updateType);
 
@@ -148,14 +143,19 @@ export default class DeferredModel extends Observable {
 
   deleteCard = async (updateType, bouquet) => {
     const savedCount = this.#deferred.products[bouquet.id];
+    const savedPrice = bouquet.price * this.#deferred.products[bouquet.id]
+
+    this.#deferred.productCount -= savedCount;
+    this.#deferred.sum -= savedPrice;
 
     delete this.#deferred.products[bouquet.id];
+
     this._notify(updateType);
 
     try {
       const deleteRequests = [];
 
-      for (let i = 0; i < this.#deferred.products[bouquet.id]; i++) {
+      for (let i = 0; i < savedCount; i++) {
         deleteRequests.push(
           this.#apiService.delete(bouquet.id)
         );
@@ -163,10 +163,13 @@ export default class DeferredModel extends Observable {
 
       await Promise.all(deleteRequests);
     } catch {
+      this.#deferred.productCount += savedCount;
+      this.#deferred.sum += savedPrice;
       this.#deferred.products[bouquet.id] = savedCount;
+
       this._notify(updateType);
 
-      throw new Error('Can\'t this card');
+      throw new Error('Can\'t delete this card');
     }
   }
 
