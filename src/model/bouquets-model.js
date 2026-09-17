@@ -5,7 +5,7 @@ export default class BouquetsModel extends Observable {
   #bouquets = [];
   #apiService = null;
   #isLoaded = false;
-  #isLoadingError = false;
+  #isLoadError = false;
 
   constructor(apiService) {
     super();
@@ -13,32 +13,36 @@ export default class BouquetsModel extends Observable {
   }
 
   init = async () => {
-    let updateType = UpdateType.INIT;
+    this.#isLoaded = false;
+    this.#isLoadError = false;
+
+    this._notify(UpdateType.LOADING);
 
     try {
       const bouquets = await this.#apiService.get();
 
       this.#bouquets = bouquets.map(this.#adaptToClient);
-      this.#isLoadingError = false;
+      this.#isLoadError = false;
     } catch {
       this.#bouquets = [];
-      this.#isLoadingError = true;
-      
-      updateType = UpdateType.ERROR;
+      this.#isLoadError = true;
     }
 
     this.#isLoaded = true;
-
-    this._notify(updateType);
+    this._notify(UpdateType.INIT);
   }
 
   get = () => this.#bouquets;
 
   getIsLoaded = () => this.#isLoaded;
 
-  getIsLoadingError = () => this.#isLoadingError;
+  getIsLoadingError = () => this.#isLoadError;
 
   getById = (id) => this.#apiService.getById(id);
+
+  // setUrlText = (urlText) => {
+  //   this.#apiService.setUrlText(urlText);
+  // }
 
   #adaptToClient = (bouquet) => {
     return {
@@ -67,7 +71,7 @@ export default class BouquetsModel extends Observable {
 
   #adaptColor = (color) => {
     if (color === "violet") {
-      return "liac";
+      return "lilac";
     } else {
       return color;
     }

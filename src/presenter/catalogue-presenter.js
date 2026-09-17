@@ -3,6 +3,7 @@ import SortingView from '../view/sorting-view.js';
 import CatalogueListView from '../view/catalogue/catalogue-list-view.js';
 import CatalogueEmptyListView from '../view/catalogue/catalogue-empty-list.js';
 import LoadMoreButtonView from '../view/catalogue/catalogue-load-more-button-view.js';
+import CatalogueReloadButtonView from '../view/catalogue/catalogue-reload-button-view.js';
 import ScrollToTopButtonView from '../view/catalogue/catalogue-scroll-to-top-button-view.js';
 import ErrorMessageView from '../view/error-message-view.js';
 import CatalogueListLoadingView from '../view/catalogue/catalogue-list-loading-view.js';
@@ -27,6 +28,7 @@ export default class CataloguePresenter {
   #catalogueEmptyListComponent = new CatalogueEmptyListView();
   #loadMoreButtonComponent = new LoadMoreButtonView();
   #scrollToTopButtonComponent = new ScrollToTopButtonView();
+  #reloadButtonComponent = new CatalogueReloadButtonView();
   #errorMessageComponent = new ErrorMessageView();
   #catalogueListLoadingComponent = new CatalogueListLoadingView();
 
@@ -45,7 +47,7 @@ export default class CataloguePresenter {
   #currentSortType = SortType.PRICE_UP;
   #isBouquetsLoading = true;
   #isDeferredLoading = true;
-  #isBouquetsLoadingError = false;
+  #isBouquetsLoadError = false;
 
   #scrollLock = new ScrollLock();
   #uiBlocker = new UiBlocker({lowerLimit: 350, upperLimit: 1000});
@@ -101,7 +103,7 @@ export default class CataloguePresenter {
 
     this.#isBouquetsLoading = !this.#bouquetsModel.getIsLoaded();
     this.#isDeferredLoading = !this.#deferredModel.getIsLoaded();
-    this.#isBouquetsLoadingError = this.#bouquetsModel.getIsLoadingError();
+    this.#isBouquetsLoadError = this.#bouquetsModel.getIsLoadingError();
 
     this.#renderCatalogue();
     render(this.#errorMessageComponent, this.#bodyContainer);
@@ -135,25 +137,27 @@ export default class CataloguePresenter {
       case UpdateType.INIT:
         this.#handleBouquetsInit();
         break;
-      case UpdateType.ERROR:
-        this.#handleBoquetsError();
+      case UpdateType.LOADING:
+        this.#handleBouquetsLoading();
         break;
     }
   }
 
   #handleBouquetsInit() {
     this.#isBouquetsLoading = !this.#bouquetsModel.getIsLoaded();
-    this.#isBouquetsLoadingError = this.#bouquetsModel.getIsLoadingError();
+    this.#isBouquetsLoadError = this.#bouquetsModel.getIsLoadingError();
 
-    remove(this.#catalogueListLoadingComponent);
     this.#renderCatalogue();
   }
 
-  #handleBoquetsError() {
-    this.#isBouquetsLoading = !this.#bouquetsModel.getIsLoaded();
-    this.#isBouquetsLoadingError = this.#bouquetsModel.getIsLoadingError();
+  #handleBouquetsLoading() {
+    remove(this.#catalogueEmptyListComponent);
+    remove(this.#reloadButtonComponent);
 
-    remove(this.#catalogueListLoadingComponent);
+    this.#isBouquetsLoading = !this.#bouquetsModel.getIsLoaded();
+    this.#isBouquetsLoadError = this.#bouquetsModel.getIsLoadingError();
+
+    this.#renderCatalogue();
   }
 
   #handleDeferredModelEvent = (updateType, data) => {
@@ -187,11 +191,12 @@ export default class CataloguePresenter {
 
   #handleDeferredInit() {
     this.#isDeferredLoading = !this.#deferredModel.getIsLoaded();
+
     this.#renderCatalogue();
   }
 
   #handleFilterModelEvent = (updateType) => {
-    if (this.#isBouquetsLoadingError) {
+    if (this.#isBouquetsLoadError) {
       return;
     }
 
@@ -354,10 +359,23 @@ export default class CataloguePresenter {
   }
 
   #renderEmptyCatalogue(container) {
-    if (this.#isBouquetsLoadingError) {
+    if (this.#isBouquetsLoadError) {
       this.#catalogueEmptyListComponent.setText("error");
+
+      this.#reloadButtonComponent.setClickHandler(() => {
+        this.#bouquetsModel.init();
+      });
+
+      render (this.#reloadButtonComponent, container);
+      // this.#bouquetsModel.setUrlText('flowers-shop/products');
     } else {
       this.#catalogueEmptyListComponent.setText("noItems");
+
+      this.#loadMoreButtonComponent.element.disabled = true;
+      this.#scrollToTopButtonComponent.element.disabled = true;
+
+      this.#renderLoadMoreButton(container);
+      this.#renderScrollToTopButton(container);
     }
 
     render(
@@ -365,9 +383,6 @@ export default class CataloguePresenter {
       container,
       RenderPosition.BEFOREBEGIN
     );
-
-    this.#renderLoadMoreButton(container);
-    this.#renderScrollToTopButton(container);
   }
 
   #renderCatalogue(sorting = false) {
@@ -380,6 +395,8 @@ export default class CataloguePresenter {
       return;
     }
 
+    remove(this.#catalogueListLoadingComponent);
+
     if (!sorting) {
       render(this.#catalogueComponent, this.#mainContainer);
       this.#renderSorting(this.#catalogueComponent.getSortingContainer());
@@ -389,6 +406,9 @@ export default class CataloguePresenter {
       this.#renderEmptyCatalogue(buttonsContainer);
       return;
     }
+
+    this.#loadMoreButtonComponent.element.disabled = false;
+    this.#scrollToTopButtonComponent.element.disabled = false;
 
     this.#renderCatalogueList(bouquets, buttonsContainer);
   }
@@ -421,5 +441,6 @@ export default class CataloguePresenter {
     remove(this.#catalogueEmptyListComponent);
     remove(this.#loadMoreButtonComponent);
     remove(this.#scrollToTopButtonComponent);
+    remove(this.#reloadButtonComponent);
   }
 }

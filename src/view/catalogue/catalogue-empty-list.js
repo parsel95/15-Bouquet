@@ -17,6 +17,8 @@ export default class CatalogueEmptyListView extends AbstractView {
   setText = (type) => {
     type === "noItems" ?
       this.element.querySelector('p').textContent = `К сожалению, таких букетов у нас пока нет` :
-      this.element.querySelector('p').textContent = `К сожалению, мы не смогли загрузить букеты. Обновите страницу или попробуйте позже.`;
+      this.element.querySelector('p').textContent = `К сожалению, нам не удалось загрузить букеты.
+        Попробуйте ещё раз`
+      ;
   }
 }
