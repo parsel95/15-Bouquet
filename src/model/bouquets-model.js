@@ -36,13 +36,9 @@ export default class BouquetsModel extends Observable {
 
   getIsLoaded = () => this.#isLoaded;
 
-  getIsLoadingError = () => this.#isLoadError;
+  getIsLoadError = () => this.#isLoadError;
 
   getById = (id) => this.#apiService.getById(id);
-
-  // setUrlText = (urlText) => {
-  //   this.#apiService.setUrlText(urlText);
-  // }
 
   #adaptToClient = (bouquet) => {
     return {

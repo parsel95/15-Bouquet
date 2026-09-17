@@ -1,4 +1,5 @@
 import AbstractView from '../../framework/view/abstract-view.js';
+import {CatalogueMessageType} from '../../const.js';
 
 const createCatalogueEmptyListTemplate = () =>
   `
@@ -15,10 +16,11 @@ export default class CatalogueEmptyListView extends AbstractView {
   }
 
   setText = (type) => {
-    type === "noItems" ?
-      this.element.querySelector('p').textContent = `К сожалению, таких букетов у нас пока нет` :
-      this.element.querySelector('p').textContent = `К сожалению, нам не удалось загрузить букеты.
-        Попробуйте ещё раз`
+    const text = type === CatalogueMessageType.EMPTY ?
+      `К сожалению, таких букетов у нас пока нет` :
+      `К сожалению, нам не удалось загрузить букеты. Попробуйте ещё раз`
       ;
+
+    this.element.querySelector('p').textContent = text;
   }
 }

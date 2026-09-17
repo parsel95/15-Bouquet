@@ -15,7 +15,7 @@ import {render, RenderPosition, remove, replace} from '../framework/render.js';
 import {setToZeroOpacity, setToFullOpacity} from '../utils/animation.js';
 import {sortBouquetsByPriceUp, sortBouquetsByPriceDown} from '../utils/common.js';
 import ScrollLock from '../utils/scroll-lock.js';
-import {SortType, UserAction, UpdateType} from '../const.js';
+import {SortType, UserAction, UpdateType, CatalogueMessageType} from '../const.js';
 import {filterReason, filterColor} from '../utils/filter.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
@@ -103,7 +103,7 @@ export default class CataloguePresenter {
 
     this.#isBouquetsLoading = !this.#bouquetsModel.getIsLoaded();
     this.#isDeferredLoading = !this.#deferredModel.getIsLoaded();
-    this.#isBouquetsLoadError = this.#bouquetsModel.getIsLoadingError();
+    this.#isBouquetsLoadError = this.#bouquetsModel.getIsLoadError();
 
     this.#renderCatalogue();
     render(this.#errorMessageComponent, this.#bodyContainer);
@@ -145,7 +145,7 @@ export default class CataloguePresenter {
 
   #handleBouquetsInit() {
     this.#isBouquetsLoading = !this.#bouquetsModel.getIsLoaded();
-    this.#isBouquetsLoadError = this.#bouquetsModel.getIsLoadingError();
+    this.#isBouquetsLoadError = this.#bouquetsModel.getIsLoadError();
 
     this.#renderCatalogue();
   }
@@ -155,7 +155,7 @@ export default class CataloguePresenter {
     remove(this.#reloadButtonComponent);
 
     this.#isBouquetsLoading = !this.#bouquetsModel.getIsLoaded();
-    this.#isBouquetsLoadError = this.#bouquetsModel.getIsLoadingError();
+    this.#isBouquetsLoadError = this.#bouquetsModel.getIsLoadError();
 
     this.#renderCatalogue();
   }
@@ -360,16 +360,15 @@ export default class CataloguePresenter {
 
   #renderEmptyCatalogue(container) {
     if (this.#isBouquetsLoadError) {
-      this.#catalogueEmptyListComponent.setText("error");
+      this.#catalogueEmptyListComponent.setText(CatalogueMessageType.ERROR);
 
       this.#reloadButtonComponent.setClickHandler(() => {
         this.#bouquetsModel.init();
       });
 
       render (this.#reloadButtonComponent, container);
-      // this.#bouquetsModel.setUrlText('flowers-shop/products');
     } else {
-      this.#catalogueEmptyListComponent.setText("noItems");
+      this.#catalogueEmptyListComponent.setText(CatalogueMessageType.EMPTY);
 
       this.#loadMoreButtonComponent.element.disabled = true;
       this.#scrollToTopButtonComponent.element.disabled = true;

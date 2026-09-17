@@ -82,6 +82,11 @@ const Method = {
   DELETE: 'DELETE',
 };
 
+const CatalogueMessageType = {
+  EMPTY: 'EMPTY',
+  ERROR: 'ERROR'
+}
+
 export {
   ReasonType,
   ReasonTypeText,
@@ -94,5 +99,6 @@ export {
   SortType,
   UserAction,
   UpdateType,
-  Method
+  Method,
+  CatalogueMessageType
 };
