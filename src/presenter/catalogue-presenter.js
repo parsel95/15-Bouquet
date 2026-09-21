@@ -5,7 +5,7 @@ import CatalogueEmptyListView from '../view/catalogue/catalogue-empty-list.js';
 import LoadMoreButtonView from '../view/catalogue/catalogue-load-more-button-view.js';
 import CatalogueReloadButtonView from '../view/catalogue/catalogue-reload-button-view.js';
 import ScrollToTopButtonView from '../view/catalogue/catalogue-scroll-to-top-button-view.js';
-import ErrorMessageView from '../view/error-message-view.js';
+import ErrorModalView from '../view/error-modal-view.js';
 import CatalogueListLoadingView from '../view/catalogue/catalogue-list-loading-view.js';
 
 import CatalogueCardPresenter from './catalogue-card-presenter.js';
@@ -29,7 +29,7 @@ export default class CataloguePresenter {
   #loadMoreButtonComponent = new LoadMoreButtonView();
   #scrollToTopButtonComponent = new ScrollToTopButtonView();
   #reloadButtonComponent = new CatalogueReloadButtonView();
-  #errorMessageComponent = new ErrorMessageView();
+  #catalogueErrorModalComponent = new ErrorModalView();
   #catalogueListLoadingComponent = new CatalogueListLoadingView();
 
   #bodyContainer = null;
@@ -48,6 +48,7 @@ export default class CataloguePresenter {
   #isBouquetsLoading = true;
   #isDeferredLoading = true;
   #isBouquetsLoadError = false;
+  #isDeferredChangingError = false;
 
   #scrollLock = new ScrollLock();
   #uiBlocker = new UiBlocker({lowerLimit: 350, upperLimit: 1000});
@@ -106,7 +107,6 @@ export default class CataloguePresenter {
     this.#isBouquetsLoadError = this.#bouquetsModel.getIsLoadError();
 
     this.#renderCatalogue();
-    render(this.#errorMessageComponent, this.#bodyContainer);
     this.#savedRenderedBouquetsCount = null;
   }
 
@@ -117,7 +117,7 @@ export default class CataloguePresenter {
       try {
         await this.#handleUpdateBouquet(updateType, updateBouquet);
       } catch {
-        this.#showErrorMessage();
+        this.#renderCatalogueErrorModal();
       } finally {
         this.#uiBlocker.unblock();
       }
@@ -128,8 +128,22 @@ export default class CataloguePresenter {
     return this.#deferredModel.toggleDeferred(updateType, updatedBouquet);
   }
 
-  #showErrorMessage(message) {
-    this.#errorMessageComponent.show(message);
+  #renderCatalogueErrorModal() {
+    render(this.#catalogueErrorModalComponent, this.#bodyContainer);
+    this.#catalogueErrorModalComponent.setClickHandler(this.#handleErrorModalClose);
+    document.addEventListener('keydown', this.#onEscKeyDown);
+    this.#isDeferredChangingError = true;
+  }
+
+  #handleErrorModalClose = () => {
+    remove(this.#catalogueErrorModalComponent);
+    this.#catalogueErrorModalComponent.removeClickHandler();
+
+    if (!this.#modalPresenter) {
+      document.removeEventListener('keydown', this.#onEscKeyDown);
+    }
+
+    this.#isDeferredChangingError = false;
   }
 
   #handleBouquetsModelEvent = (updateType) => {
@@ -270,6 +284,7 @@ export default class CataloguePresenter {
     this.#cardPresenters.forEach((presenter) => presenter.destroy());
     this.#cardPresenters.clear();
     this.#renderedBouquetsCount = BOUQUET_COUNT_PER_STEP;
+
     remove(this.#loadMoreButtonComponent);
     remove(this.#scrollToTopButtonComponent);
     remove(this.#catalogueEmptyListComponent);
@@ -410,11 +425,19 @@ export default class CataloguePresenter {
     this.#scrollToTopButtonComponent.element.disabled = false;
 
     this.#renderCatalogueList(bouquets, buttonsContainer);
+    render(this.#uiBlocker, this.#bodyContainer);
   }
 
   #onEscKeyDown = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
+
+      if (this.#isDeferredChangingError) {
+        console.log(this.#isDeferredChangingError)
+        this.#handleErrorModalClose();
+        return;
+      }
+
       this.#handleCloseModal();
     }
   }
@@ -435,11 +458,10 @@ export default class CataloguePresenter {
     remove(this.#catalogueComponent);
     remove(this.#sortingComponent);
     remove(this.#catalogueListComponent);
-    remove(this.#errorMessageComponent);
-    remove(this.#catalogueListLoadingComponent);
-    remove(this.#catalogueEmptyListComponent);
-    remove(this.#loadMoreButtonComponent);
-    remove(this.#scrollToTopButtonComponent);
     remove(this.#reloadButtonComponent);
+    remove(this.#catalogueErrorModalComponent);
+    remove(this.#catalogueListLoadingComponent);
+
+    remove(this.#uiBlocker);
   }
 }

@@ -1,17 +1,17 @@
+import AbstractView from '../../framework/view/abstract-view';
 import './ui-blocker.css';
+
+const createUiBlockerTemplate = () => `<div class="ui-blocker"></div>`;
 
 /**
  * Класс для блокировки интерфейса
  */
-export default class UiBlocker {
+export default class UiBlocker extends AbstractView {
   /** @type {number} Время до блокировки интерфейса в миллисекундах */
   #lowerLimit;
 
   /** @type {number} Минимальное время блокировки интерфейса в миллисекундах */
   #upperLimit;
-
-  /** @type {HTMLElement|null} Элемент, блокирующий интерфейс */
-  #element;
 
   /** @type {number} Время вызова метода block */
   #startTime;
@@ -22,24 +22,35 @@ export default class UiBlocker {
   /** @type {number} Идентификатор таймера */
   #timerId;
 
+  /** @type {boolean} Флаг, указывающий, нужно ли показывать визуальный индикатор загрузки */
+  #showLoader;
+
   /**
    * @param {Object} config Объект с настройками блокировщика
    * @param {number} config.lowerLimit Время до отображения визуального индикатора загрузки. Сам интерфейс блокируется сразу.
    * @param {number} config.upperLimit Минимальное время блокировки в миллисекундах. Минимальная длительность блокировки
    */
-  constructor({lowerLimit, upperLimit}) {
+  constructor({lowerLimit, upperLimit, showLoader = true}) {
+    super();
+
     this.#lowerLimit = lowerLimit;
     this.#upperLimit = upperLimit;
+    this.#showLoader = showLoader;
+  }
 
-    this.#element = document.createElement('div');
-    this.#element.classList.add('ui-blocker');
-    document.querySelector('.wrapper').append(this.#element);
+  get template() {
+    return createUiBlockerTemplate();
   }
 
   /** Метод для блокировки интерфейса */
   block() {
     this.#addClass('ui-blocker-blocked');
     this.#startTime = Date.now();
+
+    if (!this.#showLoader) {
+      return;
+    }
+
     this.#timerId = setTimeout(() => {
       this.#addClass('ui-blocker--loading');
     }, this.#lowerLimit);
@@ -49,6 +60,11 @@ export default class UiBlocker {
   unblock() {
     this.#endTime = Date.now();
     const duration = this.#endTime - this.#startTime;
+
+    if (!this.#showLoader) {
+      this.#removeClass('ui-blocker-blocked');
+      return;
+    }
 
     if (duration < this.#lowerLimit) {
       clearTimeout(this.#timerId);
@@ -70,11 +86,11 @@ export default class UiBlocker {
 
   /** Метод, добавляющий CSS-класс элементу */
   #addClass = (className) => {
-    this.#element.classList.add(className);
+    this.element.classList.add(className);
   };
 
   /** Метод, убирающий CSS-класс с элемента */
   #removeClass = (className) => {
-    this.#element.classList.remove(className);
+    this.element.classList.remove(className);
   };
 }

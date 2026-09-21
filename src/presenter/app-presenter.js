@@ -115,6 +115,7 @@ export default class AppPresenter {
       } else if (targetPage === Page.DEFERRED) {
         this.#deferredPresenter = new DeferredPresenter(
           this.#mainContainer,
+          this.#bodyContainer,
           this.#bouquetsModel,
           this.#deferredModel,
           () => this.#switchPage(Page.MAIN),
