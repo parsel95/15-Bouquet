@@ -117,7 +117,7 @@ export default class CataloguePresenter {
       try {
         await this.#handleUpdateBouquet(updateType, updateBouquet);
       } catch {
-        this.#renderCatalogueErrorModal();
+        this.#renderCatalogueErrorModal(CatalogueMessageType.ERROR_DEFERRED);
       } finally {
         this.#uiBlocker.unblock();
       }
@@ -128,7 +128,8 @@ export default class CataloguePresenter {
     return this.#deferredModel.toggleDeferred(updateType, updatedBouquet);
   }
 
-  #renderCatalogueErrorModal() {
+  #renderCatalogueErrorModal(type) {
+    this.#catalogueErrorModalComponent.setText(type);
     render(this.#catalogueErrorModalComponent, this.#bodyContainer);
     this.#catalogueErrorModalComponent.setClickHandler(this.#handleErrorModalClose);
     document.addEventListener('keydown', this.#onEscKeyDown);
@@ -330,7 +331,7 @@ export default class CataloguePresenter {
     try {
       this.#selectedBouquet = await this.#bouquetsModel.getById(bouquet.id);
     } catch {
-      console.error('Не удалось загрузить букет');
+      this.#renderCatalogueErrorModal(CatalogueMessageType.ERROR_MODAL);
       return;
     }
 
@@ -375,7 +376,7 @@ export default class CataloguePresenter {
 
   #renderEmptyCatalogue(container) {
     if (this.#isBouquetsLoadError) {
-      this.#catalogueEmptyListComponent.setText(CatalogueMessageType.ERROR);
+      this.#catalogueEmptyListComponent.setText(CatalogueMessageType.ERROR_BOUQUETS);
 
       this.#reloadButtonComponent.setClickHandler(() => {
         this.#bouquetsModel.init();
@@ -433,7 +434,6 @@ export default class CataloguePresenter {
       evt.preventDefault();
 
       if (this.#isDeferredChangingError) {
-        console.log(this.#isDeferredChangingError)
         this.#handleErrorModalClose();
         return;
       }

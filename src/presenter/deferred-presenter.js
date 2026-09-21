@@ -12,7 +12,7 @@ import DeferredCardPresenter from './deferred-card-presenter.js';
 
 import {render, RenderPosition, remove, replace} from '../framework/render.js';
 import {setToZeroOpacity, setToFullOpacity} from '../utils/animation.js';
-import {UserAction, UpdateType} from '../const.js';
+import {UserAction, UpdateType, CatalogueMessageType} from '../const.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 export default class DeferredPresenter {
@@ -100,7 +100,8 @@ export default class DeferredPresenter {
     this.#deferredCleanButtonComponent.element.disabled = true;
   }
 
-  #renderDeferredErrorModal() {
+  #renderDeferredErrorModal(type) {
+    this.#deferredErrorModalComponent.setText(type)
     render(this.#deferredErrorModalComponent, this.#mainContainer);
     this.#deferredErrorModalComponent.setClickHandler(this.#handleErrorModalClose);
     document.addEventListener('keydown', this.#onEscKeyDown);
@@ -149,7 +150,7 @@ export default class DeferredPresenter {
           break;
       }
     } catch {
-      this.#renderDeferredErrorModal();
+      this.#renderDeferredErrorModal(CatalogueMessageType.ERROR_DEFERRED);
     } finally {
       uiBlocker.unblock();
     }

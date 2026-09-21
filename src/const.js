@@ -84,7 +84,9 @@ const Method = {
 
 const CatalogueMessageType = {
   EMPTY: 'EMPTY',
-  ERROR: 'ERROR'
+  ERROR_BOUQUETS: 'ERROR_BOUQUETS',
+  ERROR_DEFERRED: 'ERROR_DEFERRED',
+  ERROR_MODAL: 'ERROR_MODAL'
 }
 
 export {
