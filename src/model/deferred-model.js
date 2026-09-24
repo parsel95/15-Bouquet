@@ -26,7 +26,6 @@ export default class DeferredModel extends Observable {
         this.#deferred = deferred;
       }
     } catch {
-      console.log('DEFERRED ERROR:');
       this.#deferred = deferred;
     }
 
@@ -117,7 +116,6 @@ export default class DeferredModel extends Observable {
 
   cleanAll = async (updateType) => {
     const savedDeferred = this.#deferred;
-    console.log(this.#deferred)
     this.#deferred = deferred;
     this._notify(updateType);
 

@@ -5,7 +5,6 @@ import AdvantagesView from '../view/advantages-view.js';
 import CataloguePresenter from './catalogue-presenter.js';
 import FilterReasonPresenter from './filter-reason-presenter.js';
 import FilterColorPresenter from './filter-color-presenter.js';
-import DeferredPresenter from './deferred-presenter.js';
 
 import {render, remove} from '../framework/render.js';
 
@@ -33,6 +32,10 @@ export default class MainPagePresenter {
     this.#filterModel = filterModel;
   }
 
+  get selectedSortType() {
+    return this.#cataloguePresenter.selectedSortType;
+  }
+
   getBouquetsCount() {
     if (this.#cataloguePresenter) {
       return this.#cataloguePresenter.getRenderedBouquetsCount();
@@ -40,8 +43,8 @@ export default class MainPagePresenter {
     return null;
   }
 
-  init(savedCount = null) {
-    this.#renderMainPage(savedCount);
+  init(savedCount = null, shouldRestore = false, sortType) {
+    this.#renderMainPage(savedCount, shouldRestore, sortType);
   }
 
   #renderStaticSections() {
@@ -58,7 +61,7 @@ export default class MainPagePresenter {
     this.#filterColorPresenter.init();
   }
 
-  #renderCatalogue(savedCount) {
+  #renderCatalogue(savedCount, shouldRestore, sortType) {
     this.#cataloguePresenter = new CataloguePresenter(
       this.#bodyContainer,
       this.#mainContainer,
@@ -66,13 +69,18 @@ export default class MainPagePresenter {
       this.#deferredModel,
       this.#filterModel
     );
+
+    if (shouldRestore) {
+      this.#cataloguePresenter.currentSortType = sortType;
+    }
+
     this.#cataloguePresenter.init(savedCount);
   }
 
-  #renderMainPage(savedCount) {
+  #renderMainPage(savedCount, shouldRestore, sortType) {
     this.#renderStaticSections();
     this.#renderFiltersSections();
-    this.#renderCatalogue(savedCount);
+    this.#renderCatalogue(savedCount, shouldRestore, sortType);
   }
 
   destroy() {

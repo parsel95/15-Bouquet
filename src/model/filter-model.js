@@ -13,6 +13,14 @@ export default class FilterModel extends Observable {
     return [...this.#colorFilters];
   }
 
+  setReasonFilterStandart = () => {
+    this.#reasonFilter = ReasonType.ALL;
+  }
+
+  setColorFilterStandart = () => {
+    this.#colorFilters = [ColorType.ALL];
+  }
+
   setReasonFilter = (updateType, reasonFilter) => {
     if (this.#reasonFilter === reasonFilter) {
       return;

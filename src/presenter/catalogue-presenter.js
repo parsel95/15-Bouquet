@@ -89,6 +89,14 @@ export default class CataloguePresenter {
     return this.#deferredModel.get();
   }
 
+  get selectedSortType() {
+    return this.#currentSortType;
+  }
+
+  set currentSortType(sortType) {
+    this.#currentSortType = sortType;
+  }
+
   getRenderedBouquetsCount() {
     return this.#renderedBouquetsCount;
   }
@@ -461,7 +469,6 @@ export default class CataloguePresenter {
     remove(this.#reloadButtonComponent);
     remove(this.#catalogueErrorModalComponent);
     remove(this.#catalogueListLoadingComponent);
-
     remove(this.#uiBlocker);
   }
 }
