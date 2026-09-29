@@ -50,7 +50,7 @@ export default class CataloguePresenter {
   #isBouquetsLoading = true;
   #isDeferredLoading = true;
   #isBouquetsLoadError = false;
-  #isDeferredChangingError = false;
+  #isErrorModalOpen = false;
 
   #scrollLock = new ScrollLock();
   #uiBlocker = new UiBlocker({lowerLimit: 350, upperLimit: 1000});
@@ -91,7 +91,7 @@ export default class CataloguePresenter {
     return this.#deferredModel.get();
   }
 
-  get selectedSortType() {
+  get currentSortType() {
     return this.#currentSortType;
   }
 
@@ -143,7 +143,7 @@ export default class CataloguePresenter {
     render(this.#catalogueErrorModalComponent, this.#bodyContainer);
     this.#catalogueErrorModalComponent.setClickHandler(this.#handleErrorModalClose);
     document.addEventListener('keydown', this.#onEscKeyDown);
-    this.#isDeferredChangingError = true;
+    this.#isErrorModalOpen = true;
   }
 
   #handleErrorModalClose = () => {
@@ -154,7 +154,7 @@ export default class CataloguePresenter {
       document.removeEventListener('keydown', this.#onEscKeyDown);
     }
 
-    this.#isDeferredChangingError = false;
+    this.#isErrorModalOpen = false;
   }
 
   #handleBouquetsModelEvent = (updateType) => {
@@ -436,7 +436,7 @@ export default class CataloguePresenter {
     );
   }
 
-  #renderCatalogue(sorting = false) {
+  #renderCatalogue(shouldRenderSorting = false) {
     const renderCount = this.#savedRenderedBouquetsCount ?? BOUQUET_COUNT_PER_STEP;
     const bouquets = this.bouquets.slice(0, renderCount);
     const buttonsContainer = this.#catalogueComponent.getButtonsContainer();
@@ -448,7 +448,7 @@ export default class CataloguePresenter {
 
     remove(this.#catalogueListLoadingComponent);
 
-    if (!sorting) {
+    if (!shouldRenderSorting) {
       render(this.#catalogueComponent, this.#mainContainer);
       this.#renderSorting(this.#catalogueComponent.getSortingContainer());
     }
@@ -469,7 +469,7 @@ export default class CataloguePresenter {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
 
-      if (this.#isDeferredChangingError) {
+      if (this.#isErrorModalOpen) {
         this.#handleErrorModalClose();
         return;
       }

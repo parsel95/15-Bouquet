@@ -23,7 +23,6 @@ export default class DeferredPresenter {
   #deferredCatalogComponent = new DeferredCatalogView();
   #deferredEmptyListComponent = new DeferredEmptyListView();
   #deferredErrorModalComponent = new ErrorModalView();
-  #deferredCatalogItemComponent = null;
   #deferredBtnContainerComponent = new DeferredBtnContainerView();
   #deferredCleanButtonComponent = new DeferredCleanButtonView();
   #deferredSumComponent = null;
@@ -82,7 +81,7 @@ export default class DeferredPresenter {
     }
 
     Object.entries(deferred.products).forEach(([id, count]) => {
-      const bouquet = bouquets.find((item) => item.id == id);
+      const bouquet = bouquets.find((item) => String(item.id) === id);
 
       this.#renderDeferredItem(bouquet, count);
     })
@@ -165,6 +164,7 @@ export default class DeferredPresenter {
           await this.#handleDeleteBouquet(updateType, updateBouquet);
           break;
         case UserAction.CLEAN_ALL_BOUQUETS:
+          this.#deferredCleanButtonComponent.buttonText = true;
           await this.#handleCleanAllBouquets(updateType);
           break;
         default:
@@ -178,6 +178,7 @@ export default class DeferredPresenter {
       }
     } finally {
       uiBlocker.unblock();
+      this.#deferredCleanButtonComponent.buttonText = false;
     }
   }
 
@@ -283,7 +284,6 @@ export default class DeferredPresenter {
     remove(this.#heroDeferredComponent);
     remove(this.#deferredBackButtonComponent);
     remove(this.#deferredCatalogComponent);
-    remove(this.#deferredCatalogItemComponent);
     remove(this.#deferredEmptyListComponent);
     remove(this.#deferredCleanButtonComponent);
     remove(this.#deferredSumComponent);

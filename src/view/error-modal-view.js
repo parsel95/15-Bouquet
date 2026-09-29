@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {CatalogueMessageType} from '../const.js';
+import {CatalogueMessageType, ErrorMessage} from '../const.js';
 
 const createErrorModalTemplate = () => `
   <div class="error-modal" role="alertdialog" aria-modal="true">
@@ -26,10 +26,16 @@ export default class ErrorModalView extends AbstractView {
   }
 
   setText = (type) => {
-    const text = type === CatalogueMessageType.ERROR_UPDATE_DEFERRED ?
-      `Не удалось изменить отложенные. Попробуйте ещё раз.` :
-      `Не удалось загрузить информацию о букете. Попробуйте ещё раз.`
-    ;
+    let text = null;
+
+    switch (type){
+      case CatalogueMessageType.ERROR_UPDATE_DEFERRED:
+        text = ErrorMessage[CatalogueMessageType.ERROR_UPDATE_DEFERRED]
+        break;
+      case CatalogueMessageType.ERROR_MODAL:
+        text = ErrorMessage[CatalogueMessageType.ERROR_MODAL]
+        break;
+    }
 
     this.element.querySelector('.error-modal__text').textContent = text;
   }

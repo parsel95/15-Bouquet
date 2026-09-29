@@ -32,11 +32,11 @@ export default class MainPagePresenter {
     this.#filterModel = filterModel;
   }
 
-  get selectedSortType() {
-    return this.#cataloguePresenter.selectedSortType;
+  get currentSortType() {
+    return this.#cataloguePresenter.currentSortType;
   }
 
-  getBouquetsCount() {
+  getRenderedBouquetsCount() {
     if (this.#cataloguePresenter) {
       return this.#cataloguePresenter.getRenderedBouquetsCount();
     }

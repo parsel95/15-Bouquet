@@ -90,6 +90,13 @@ const CatalogueMessageType = {
   ERROR_MODAL: 'ERROR_MODAL'
 }
 
+const ErrorMessage = {
+  [CatalogueMessageType.EMPTY]: 'К сожалению, таких букетов у нас пока нет',
+  [CatalogueMessageType.ERROR_BOUQUETS]: 'К сожалению, нам не удалось загрузить букеты. Попробуйте ещё раз',
+  [CatalogueMessageType.ERROR_UPDATE_DEFERRED]: 'Не удалось изменить отложенные. Попробуйте ещё раз.',
+  [CatalogueMessageType.ERROR_MODAL]: 'Не удалось загрузить информацию о букете. Попробуйте ещё раз.',
+};
+
 const DeferredErrorType = {
   CLEAN_ALL: 'CLEAN_ALL',
   SYNC: 'SYNC',
@@ -109,5 +116,6 @@ export {
   UpdateType,
   Method,
   CatalogueMessageType,
+  ErrorMessage,
   DeferredErrorType
 };

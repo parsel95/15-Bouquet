@@ -78,8 +78,8 @@ export default class AppPresenter {
   #switchPage = (targetPage, shouldRestore = false, time = 400) => {
     if (this.#mainPagePresenter) {
       this.#mainScrollPosition = window.scrollY;
-      this.#renderedBouquetsCount = this.#mainPagePresenter.getBouquetsCount();
-      this.#savedSortType = this.#mainPagePresenter.selectedSortType;
+      this.#renderedBouquetsCount = this.#mainPagePresenter.getRenderedBouquetsCount();
+      this.#savedSortType = this.#mainPagePresenter.currentSortType;
     }
 
     window.scrollTo(0, 0);
