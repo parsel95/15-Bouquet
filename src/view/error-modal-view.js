@@ -26,7 +26,7 @@ export default class ErrorModalView extends AbstractView {
   }
 
   setText = (type) => {
-    const text = type === CatalogueMessageType.ERROR_DEFERRED ?
+    const text = type === CatalogueMessageType.ERROR_UPDATE_DEFERRED ?
       `Не удалось изменить отложенные. Попробуйте ещё раз.` :
       `Не удалось загрузить информацию о букете. Попробуйте ещё раз.`
     ;

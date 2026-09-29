@@ -85,9 +85,15 @@ const Method = {
 const CatalogueMessageType = {
   EMPTY: 'EMPTY',
   ERROR_BOUQUETS: 'ERROR_BOUQUETS',
-  ERROR_DEFERRED: 'ERROR_DEFERRED',
+  ERROR_UPDATE_DEFERRED: 'ERROR_UPDATE_DEFERRED',
+  ERROR_LOAD_DEFERRED: 'ERROR_LOAD_DEFERRED',
   ERROR_MODAL: 'ERROR_MODAL'
 }
+
+const DeferredErrorType = {
+  CLEAN_ALL: 'CLEAN_ALL',
+  SYNC: 'SYNC',
+};
 
 export {
   ReasonType,
@@ -102,5 +108,6 @@ export {
   UserAction,
   UpdateType,
   Method,
-  CatalogueMessageType
+  CatalogueMessageType,
+  DeferredErrorType
 };

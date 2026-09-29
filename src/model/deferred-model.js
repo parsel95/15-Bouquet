@@ -1,16 +1,16 @@
 import Observable from '../framework/observable.js';
 import {deferredBoquets} from '../mock/deferred-bouquets.js';
-import {UpdateType} from '../const.js';
+import {UpdateType, DeferredErrorType} from '../const.js';
 
-const deferred = {
+const createEmptyDeferred = () => ({
   products: {},
   productCount: 0,
   sum: 0,
-};
+});
 
 export default class DeferredModel extends Observable {
   #deferredBouquets = deferredBoquets;
-  #deferred = deferred;
+  #deferred = createEmptyDeferred();
   #apiService = null;
   #isLoaded = false;
 
@@ -22,17 +22,21 @@ export default class DeferredModel extends Observable {
   init = async () => {
     try {
       this.#deferred = await this.#apiService.get();
+
       if (Object.keys(this.#deferred).length === 0) {
-        this.#deferred = deferred;
+        this.#deferred = createEmptyDeferred();
       }
     } catch {
-      this.#deferred = deferred;
+      this.#deferred = createEmptyDeferred();
+      this._notify(UpdateType.ERROR_LOAD_DEFERRED);
     }
 
     this.#isLoaded = true;
-
     this._notify(UpdateType.INIT);
+    this._notify(UpdateType.MINOR);
   }
+
+  getActualDeferred = () => this.#apiService.get();
 
   get = () => this.#deferred;
 
@@ -115,28 +119,42 @@ export default class DeferredModel extends Observable {
   }
 
   cleanAll = async (updateType) => {
-    const savedDeferred = this.#deferred;
-    this.#deferred = deferred;
-    this._notify(updateType);
+    const bouquetIds = Object.keys(this.#deferred.products);
+
+    const results = await Promise.allSettled(
+      bouquetIds.map(async (bouquetId) => {
+        const quantity = this.#deferred.products[bouquetId];
+
+        for (let i = 0; i < quantity; i++) {
+          await this.#apiService.delete(bouquetId);
+        }
+      })
+    );
+
+    const hasError = results.some(
+      (result) => result.status === 'rejected'
+    );
+
+    if (!hasError) {
+      this.#deferred = createEmptyDeferred();
+      this._notify(updateType);
+      return;
+    }
 
     try {
-      const bouquetIds = Object.keys(savedDeferred.products);
+      const actualDeferred = await this.getActualDeferred();
 
-      await Promise.all(
-        bouquetIds.map(async (bouquetId) => {
-          const quantity = savedDeferred.products[bouquetId];
-
-          for (let i = 0; i < quantity; i++) {
-            await this.#apiService.delete(bouquetId);
-          }
-        })
-      );
-    } catch {
-      this.#deferred = savedDeferred;
+      this.#deferred = actualDeferred;
       this._notify(updateType);
-
-      throw new Error('Can\'t delete all bouquets');
+    } catch {
+      const error = new Error('Can\'t synchronize deferred');
+      error.type = DeferredErrorType.SYNC;
+      throw error;
     }
+
+    const error = new Error('Can\'t delete all bouquets');
+    error.type = DeferredErrorType.CLEAN_ALL;
+    throw error;
   }
 
   deleteCard = async (updateType, bouquet) => {

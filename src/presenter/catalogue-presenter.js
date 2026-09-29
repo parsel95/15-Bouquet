@@ -7,6 +7,7 @@ import CatalogueReloadButtonView from '../view/catalogue/catalogue-reload-button
 import ScrollToTopButtonView from '../view/catalogue/catalogue-scroll-to-top-button-view.js';
 import ErrorModalView from '../view/error-modal-view.js';
 import CatalogueListLoadingView from '../view/catalogue/catalogue-list-loading-view.js';
+import LoadErrorDeferredView from '../view/load-error-deferred-view.js';
 
 import CatalogueCardPresenter from './catalogue-card-presenter.js';
 import ModalPresenter from './modal-presenter.js';
@@ -31,6 +32,7 @@ export default class CataloguePresenter {
   #reloadButtonComponent = new CatalogueReloadButtonView();
   #catalogueErrorModalComponent = new ErrorModalView();
   #catalogueListLoadingComponent = new CatalogueListLoadingView();
+  #loadErrorDeferredComponent = new LoadErrorDeferredView();
 
   #bodyContainer = null;
   #mainContainer = null;
@@ -125,7 +127,7 @@ export default class CataloguePresenter {
       try {
         await this.#handleUpdateBouquet(updateType, updateBouquet);
       } catch {
-        this.#renderCatalogueErrorModal(CatalogueMessageType.ERROR_DEFERRED);
+        this.#renderCatalogueErrorModal(CatalogueMessageType.ERROR_UPDATE_DEFERRED);
       } finally {
         this.#uiBlocker.unblock();
       }
@@ -191,6 +193,8 @@ export default class CataloguePresenter {
       case UpdateType.INIT:
         this.#handleDeferredInit();
         break;
+      case UpdateType.ERROR_LOAD_DEFERRED:
+        this.#renderDeferredLoadError();
     }
   }
 
@@ -216,6 +220,25 @@ export default class CataloguePresenter {
     this.#isDeferredLoading = !this.#deferredModel.getIsLoaded();
 
     this.#renderCatalogue();
+  }
+
+  #renderDeferredLoadError = () => {
+    render(this.#loadErrorDeferredComponent, this.#bodyContainer);
+
+    this.#loadErrorDeferredComponent.setClickHandler(this.#handleDeferredLoadError);
+  }
+
+  #handleDeferredLoadError = async () => {
+    remove(this.#loadErrorDeferredComponent);
+    this.#loadErrorDeferredComponent.removeClickHandler();
+
+    this.#uiBlocker.block();
+
+    try {
+      await this.#deferredModel.init();
+    } finally {
+      this.#uiBlocker.unblock();
+    }
   }
 
   #handleFilterModelEvent = (updateType) => {
@@ -336,11 +359,15 @@ export default class CataloguePresenter {
       this.#handleCloseModal();
     }
 
+    this.#uiBlocker.block();
+
     try {
       this.#selectedBouquet = await this.#bouquetsModel.getById(bouquet.id);
     } catch {
       this.#renderCatalogueErrorModal(CatalogueMessageType.ERROR_MODAL);
       return;
+    } finally {
+      this.#uiBlocker.unblock();
     }
 
     this.#renderModal();
@@ -388,6 +415,7 @@ export default class CataloguePresenter {
 
       this.#reloadButtonComponent.setClickHandler(() => {
         this.#bouquetsModel.init();
+        this.#reloadButtonComponent.removeClickHandler();
       });
 
       render (this.#reloadButtonComponent, container);

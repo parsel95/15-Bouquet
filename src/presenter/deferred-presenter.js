@@ -7,12 +7,13 @@ import DeferredBtnContainerView from '../view/deferred/deferred-btn-container-vi
 import DeferredCleanButtonView from '../view/deferred/deferred-clean-button-view.js';
 import DeferredSumView from '../view/deferred/deferred-sum-view.js';
 import ErrorModalView from '../view/error-modal-view.js';
+import LoadErrorDeferredView from '../view/load-error-deferred-view.js';
 
 import DeferredCardPresenter from './deferred-card-presenter.js';
 
 import {render, RenderPosition, remove, replace} from '../framework/render.js';
 import {setToZeroOpacity, setToFullOpacity} from '../utils/animation.js';
-import {UserAction, UpdateType, CatalogueMessageType} from '../const.js';
+import {UserAction, UpdateType, CatalogueMessageType, DeferredErrorType} from '../const.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 export default class DeferredPresenter {
@@ -26,6 +27,7 @@ export default class DeferredPresenter {
   #deferredBtnContainerComponent = new DeferredBtnContainerView();
   #deferredCleanButtonComponent = new DeferredCleanButtonView();
   #deferredSumComponent = null;
+  #loadErrorDeferredComponent = new LoadErrorDeferredView();
 
   #mainContainer = null;
   #bodyContainer = null;
@@ -38,7 +40,7 @@ export default class DeferredPresenter {
 
   #uiBlocker = new UiBlocker({lowerLimit: 350, upperLimit: 1000});
 
-  #cleanAllUiBlocker = new UiBlocker({showLoader: false});
+  #cleanAllUiBlocker = new UiBlocker({lowerLimit: 500, upperLimit: 1000});
 
   constructor(container, bodyContainer, bouquetsModel, deferredModel, handleCloseDeferred, handleBackToMain) {
     this.#mainContainer = container;
@@ -113,6 +115,25 @@ export default class DeferredPresenter {
     document.removeEventListener('keydown', this.#onEscKeyDown);
   }
 
+  #renderDeferredLoadError = () => {
+    render(this.#loadErrorDeferredComponent, this.#bodyContainer);
+
+    this.#loadErrorDeferredComponent.setClickHandler(this.#handleDeferredLoadError);
+  }
+
+  #handleDeferredLoadError = async () => {
+    remove(this.#loadErrorDeferredComponent);
+    this.#loadErrorDeferredComponent.removeClickHandler();
+
+    this.#uiBlocker.block();
+
+    try {
+      await this.#deferredModel.init();
+    } finally {
+      this.#uiBlocker.unblock();
+    }
+  }
+
   #renderDeferredItem(bouquet, count) {
     const cardPresenter = new DeferredCardPresenter(
       this.#deferredCatalogComponent.element,
@@ -149,8 +170,12 @@ export default class DeferredPresenter {
         default:
           break;
       }
-    } catch {
-      this.#renderDeferredErrorModal(CatalogueMessageType.ERROR_DEFERRED);
+    } catch (error) {
+      if (error.type === DeferredErrorType.SYNC) {
+        this.#renderDeferredLoadError();
+      } else {
+        this.#renderDeferredErrorModal(CatalogueMessageType.ERROR_UPDATE_DEFERRED);
+      }
     } finally {
       uiBlocker.unblock();
     }
@@ -180,6 +205,8 @@ export default class DeferredPresenter {
       case UpdateType.MINOR:
         this.#handleMinor();
         break;
+      case UpdateType.ERROR_LOAD_DEFERRED:
+        this.#renderDeferredLoadError();
     }
   }
 
@@ -261,6 +288,7 @@ export default class DeferredPresenter {
     remove(this.#deferredCleanButtonComponent);
     remove(this.#deferredSumComponent);
     remove(this.#deferredErrorModalComponent);
+    remove(this.#loadErrorDeferredComponent);
 
     remove(this.#uiBlocker);
     remove(this.#cleanAllUiBlocker);
