@@ -42,6 +42,8 @@ export default class FilterModel extends Observable {
     if (colorFilter === ColorType.ALL) {
       if (!this.#colorFilters.includes(ColorType.ALL)) {
         this.#colorFilters = [ColorType.ALL];
+      } else {
+        return;
       }
 
       this._notify(updateType, colorFilter);

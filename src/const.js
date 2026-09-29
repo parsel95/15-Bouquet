@@ -56,7 +56,7 @@ const Page = {
 
 const SortType = {
   PRICE_UP: 'price-up',
-  PRICE_DOWN: 'price-down'
+  PRICE_DOWN: 'price-down',
 }
 
 const UserAction = {
@@ -65,7 +65,7 @@ const UserAction = {
   DELETE_BOUQUET: 'DELETE_BOUQUET',
   INCREMENT_BOUQUET: 'INCREMENT_BOUQUET',
   DECREMENT_BOUQUET: 'DECREMENT_BOUQUET',
-  CLEAN_ALL_BOUQUETS: 'CLEAN_ALL_BOUQUETS'
+  CLEAN_ALL_BOUQUETS: 'CLEAN_ALL_BOUQUETS',
 }
 
 const UpdateType = {
@@ -73,7 +73,7 @@ const UpdateType = {
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
   INIT: 'INIT',
-  LOADING: 'LOADING'
+  LOADING: 'LOADING',
 }
 
 const Method = {
@@ -87,7 +87,7 @@ const CatalogueMessageType = {
   ERROR_BOUQUETS: 'ERROR_BOUQUETS',
   ERROR_UPDATE_DEFERRED: 'ERROR_UPDATE_DEFERRED',
   ERROR_LOAD_DEFERRED: 'ERROR_LOAD_DEFERRED',
-  ERROR_MODAL: 'ERROR_MODAL'
+  ERROR_MODAL: 'ERROR_MODAL',
 }
 
 const ErrorMessage = {
@@ -100,6 +100,7 @@ const ErrorMessage = {
 const DeferredErrorType = {
   CLEAN_ALL: 'CLEAN_ALL',
   SYNC: 'SYNC',
+  CLEAN_CARD: 'CLEAN_CARD',
 };
 
 export {

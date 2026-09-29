@@ -36,7 +36,15 @@ export default class DeferredModel extends Observable {
     this._notify(UpdateType.MINOR);
   }
 
-  getActualDeferred = () => this.#apiService.get();
+  getActualDeferred = async () => {
+    const deferred = await this.#apiService.get();
+
+    if (Object.keys(deferred).length === 0) {
+      return createEmptyDeferred();
+    }
+
+    return deferred;
+  }
 
   get = () => this.#deferred;
 
@@ -159,7 +167,8 @@ export default class DeferredModel extends Observable {
 
   deleteCard = async (updateType, bouquet) => {
     const savedCount = this.#deferred.products[bouquet.id];
-    const savedPrice = bouquet.price * this.#deferred.products[bouquet.id]
+    const savedPrice = bouquet.price * this.#deferred.products[bouquet.id];
+    const deleteRequests = [];
 
     this.#deferred.productCount -= savedCount;
     this.#deferred.sum -= savedPrice;
@@ -168,25 +177,35 @@ export default class DeferredModel extends Observable {
 
     this._notify(updateType);
 
-    try {
-      const deleteRequests = [];
-
-      for (let i = 0; i < savedCount; i++) {
-        deleteRequests.push(
-          this.#apiService.delete(bouquet.id)
-        );
-      }
-
-      await Promise.all(deleteRequests);
-    } catch {
-      this.#deferred.productCount += savedCount;
-      this.#deferred.sum += savedPrice;
-      this.#deferred.products[bouquet.id] = savedCount;
-
-      this._notify(updateType);
-
-      throw new Error('Can\'t delete this card');
+    for (let i = 0; i < savedCount; i++) {
+      deleteRequests.push(
+        this.#apiService.delete(bouquet.id)
+      );
     }
+
+    const results = await Promise.allSettled(deleteRequests);
+    const hasError = results.some(
+      (result) => result.status === 'rejected'
+    );
+
+    if (!hasError) {
+      return;
+    }
+
+    try {
+      const actualDeferred = await this.getActualDeferred();
+
+      this.#deferred = actualDeferred;
+      this._notify(updateType);
+    } catch {
+      const error = new Error('Can\'t synchronize deferred');
+      error.type = DeferredErrorType.SYNC;
+      throw error;
+    }
+
+    const error = new Error('Can\'t delete this card');
+    error.type = DeferredErrorType.CLEAN_CARD;
+    throw error;
   }
 
   toggleDeferred = (updateType, bouquet) => {
