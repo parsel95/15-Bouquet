@@ -29,6 +29,7 @@ export default class DeferredModel extends Observable {
     } catch {
       this.#deferred = createEmptyDeferred();
       this._notify(UpdateType.ERROR_LOAD_DEFERRED);
+
     }
 
     this.#isLoaded = true;

@@ -172,6 +172,10 @@ export default class CataloguePresenter {
     this.#isBouquetsLoading = !this.#bouquetsModel.getIsLoaded();
     this.#isBouquetsLoadError = this.#bouquetsModel.getIsLoadError();
 
+    if (this.#cardPresenters.size > 0) {
+      this.#clearCatalogueCards();
+    }
+
     this.#renderCatalogue();
   }
 
@@ -218,6 +222,10 @@ export default class CataloguePresenter {
 
   #handleDeferredInit() {
     this.#isDeferredLoading = !this.#deferredModel.getIsLoaded();
+
+    if (this.#cardPresenters.size > 0) {
+      this.#clearCatalogueCards();
+    }
 
     this.#renderCatalogue();
   }
@@ -312,9 +320,14 @@ export default class CataloguePresenter {
     this.#scrollToTopButtonComponent.setClickHandler(() => this.#catalogueComponent.scrollToSorting());
   }
 
-  #clearCatalogueList() {
+  #clearCatalogueCards() {
     this.#cardPresenters.forEach((presenter) => presenter.destroy());
     this.#cardPresenters.clear();
+  }
+
+  #clearCatalogueList() {
+    this.#clearCatalogueCards();
+
     this.#renderedBouquetsCount = BOUQUET_COUNT_PER_STEP;
 
     remove(this.#loadMoreButtonComponent);
@@ -323,6 +336,7 @@ export default class CataloguePresenter {
   }
 
   #renderCatalogueList(bouquets, container) {
+
     render(this.#catalogueListComponent, container, RenderPosition.BEFOREBEGIN);
     this.#renderCards(bouquets, this.#catalogueListComponent.element);
 
