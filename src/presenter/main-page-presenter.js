@@ -18,7 +18,6 @@ export default class MainPagePresenter {
   #bouquetsModel = null;
   #deferredModel = null;
   #filterModel = null;
-  #savedCount = null;
 
   #cataloguePresenter = null;
   #filterReasonPresenter = null;

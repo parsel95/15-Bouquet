@@ -1,4 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
+import {ErrorMessage} from '../const.js';
 
 const createLoadErrorDeferredTemplate = () => `
   <div class="load-error-deferred" role="alertdialog" aria-modal="true">
@@ -7,9 +8,7 @@ const createLoadErrorDeferredTemplate = () => `
         Упс, что-то пошло не так
       </p>
 
-      <p class="load-error-deferred__text">
-        Не удалось загрузить отложенные. Попробуйте ещё раз.
-      </p>
+      <p class="load-error-deferred__text"></p>
 
       <button
         class="btn load-error-deferred__button"
@@ -26,8 +25,8 @@ export default class LoadErrorDeferredView extends AbstractView {
     return createLoadErrorDeferredTemplate();
   }
 
-  setText = (text) => {
-    this.element.querySelector('.load-error-deferred__text').textContent = text;
+  setText = (type) => {
+    this.element.querySelector('.load-error-deferred__text').textContent = ErrorMessage[type];
   }
 
   setClickHandler = (callback) => {

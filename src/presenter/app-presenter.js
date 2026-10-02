@@ -75,6 +75,55 @@ export default class AppPresenter {
     this.#logoFooterComponent.setClickHandler(() => this.#switchPage(Page.MAIN));
   }
 
+  #destroyCurrentPage() {
+    if (this.#mainPagePresenter) {
+      this.#mainPagePresenter.destroy();
+      this.#mainPagePresenter = null;
+    }
+
+    if (this.#deferredPresenter) {
+      this.#deferredPresenter.destroy();
+      this.#deferredPresenter = null;
+    }
+  }
+
+  #renderMainPage(shouldRestore) {
+    this.#mainPagePresenter = new MainPagePresenter(
+      this.#bodyContainer,
+      this.#mainContainer,
+      this.#bouquetsModel,
+      this.#deferredModel,
+      this.#filterModel
+    );
+
+    if (shouldRestore) {
+      this.#mainPagePresenter.init(
+        this.#renderedBouquetsCount,
+        true,
+        this.#savedSortType
+      );
+
+      window.scrollTo(0, this.#mainScrollPosition);
+      return;
+    }
+
+    this.#filterModel.resetFilters();
+    this.#mainPagePresenter.init();
+  }
+
+  #renderDeferredPage() {
+    this.#deferredPresenter = new DeferredPresenter(
+      this.#mainContainer,
+      this.#bodyContainer,
+      this.#bouquetsModel,
+      this.#deferredModel,
+      () => this.#switchPage(Page.MAIN),
+      () => this.#switchPage(Page.MAIN, true)
+    );
+
+    this.#deferredPresenter.init();
+  }
+
   #switchPage = (targetPage, shouldRestore = false, time = 400) => {
     if (this.#mainPagePresenter) {
       this.#mainScrollPosition = window.scrollY;
@@ -90,45 +139,12 @@ export default class AppPresenter {
     setToZeroOpacity(this.#mainContainer, 0.5);
 
     setTimeout(() => {
-      if (this.#mainPagePresenter) {
-        this.#mainPagePresenter.destroy();
-        this.#mainPagePresenter = null;
-      }
-
-      if (this.#deferredPresenter) {
-        this.#deferredPresenter.destroy();
-        this.#deferredPresenter = null;
-      }
+      this.#destroyCurrentPage();
 
       if (targetPage === Page.MAIN) {
-        this.#mainPagePresenter = new MainPagePresenter(
-          this.#bodyContainer,
-          this.#mainContainer,
-          this.#bouquetsModel,
-          this.#deferredModel,
-          this.#filterModel
-        );
-
-        if (shouldRestore) {
-          this.#mainPagePresenter.init(this.#renderedBouquetsCount, true, this.#savedSortType);
-          window.scrollTo(0, this.#mainScrollPosition);
-        } else {
-          this.#filterModel.setReasonFilterStandart();
-          this.#filterModel.setColorFilterStandart();
-          this.#mainPagePresenter.init();
-        }
-
+        this.#renderMainPage(shouldRestore);
       } else if (targetPage === Page.DEFERRED) {
-        this.#deferredPresenter = new DeferredPresenter(
-          this.#mainContainer,
-          this.#bodyContainer,
-          this.#bouquetsModel,
-          this.#deferredModel,
-          () => this.#switchPage(Page.MAIN),
-          () => this.#switchPage(Page.MAIN, true)
-        );
-
-        this.#deferredPresenter.init();
+        this.#renderDeferredPage();
       }
 
       setToFullOpacity(this.#mainContainer);

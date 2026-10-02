@@ -16,7 +16,7 @@ import {render, RenderPosition, remove, replace} from '../framework/render.js';
 import {setToZeroOpacity, setToFullOpacity} from '../utils/animation.js';
 import {sortBouquetsByPriceUp, sortBouquetsByPriceDown} from '../utils/common.js';
 import ScrollLock from '../utils/scroll-lock.js';
-import {SortType, UserAction, UpdateType, CatalogueMessageType} from '../const.js';
+import {SortType, UserAction, UpdateType, ErrorType} from '../const.js';
 import {filterReason, filterColor} from '../utils/filter.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
@@ -126,8 +126,8 @@ export default class CataloguePresenter {
 
       try {
         await this.#handleUpdateBouquet(updateType, updateBouquet);
-      } catch {
-        this.#renderCatalogueErrorModal(CatalogueMessageType.ERROR_UPDATE_DEFERRED);
+      } catch (error) {
+        this.#renderCatalogueErrorModal(error.type);
       } finally {
         this.#uiBlocker.unblock();
       }
@@ -198,7 +198,7 @@ export default class CataloguePresenter {
         this.#handleDeferredInit();
         break;
       case UpdateType.ERROR_LOAD_DEFERRED:
-        this.#renderDeferredLoadError();
+        this.#renderDeferredLoadError(ErrorType.LOAD_DEFERRED);
     }
   }
 
@@ -230,7 +230,9 @@ export default class CataloguePresenter {
     this.#renderCatalogue();
   }
 
-  #renderDeferredLoadError = () => {
+  #renderDeferredLoadError = (type) => {
+    this.#loadErrorDeferredComponent.setText(type);
+
     render(this.#loadErrorDeferredComponent, this.#bodyContainer);
 
     this.#loadErrorDeferredComponent.setClickHandler(this.#handleDeferredLoadError);
@@ -378,7 +380,7 @@ export default class CataloguePresenter {
     try {
       this.#selectedBouquet = await this.#bouquetsModel.getById(bouquet.id);
     } catch {
-      this.#renderCatalogueErrorModal(CatalogueMessageType.ERROR_MODAL);
+      this.#renderCatalogueErrorModal(ErrorType.LOAD_MODAL);
       return;
     } finally {
       this.#uiBlocker.unblock();
@@ -425,7 +427,7 @@ export default class CataloguePresenter {
 
   #renderEmptyCatalogue(container) {
     if (this.#isBouquetsLoadError) {
-      this.#catalogueEmptyListComponent.setText(CatalogueMessageType.ERROR_BOUQUETS);
+      this.#catalogueEmptyListComponent.setText(ErrorMessage[ErrorType.LOAD_BOUQUETS]);
 
       this.#reloadButtonComponent.setClickHandler(() => {
         this.#bouquetsModel.init();
@@ -434,7 +436,7 @@ export default class CataloguePresenter {
 
       render (this.#reloadButtonComponent, container);
     } else {
-      this.#catalogueEmptyListComponent.setText(CatalogueMessageType.EMPTY);
+      this.#catalogueEmptyListComponent.setText(CatalogueMessage[CatalogueMessageType.EMPTY]);
 
       this.#loadMoreButtonComponent.element.disabled = true;
       this.#scrollToTopButtonComponent.element.disabled = true;

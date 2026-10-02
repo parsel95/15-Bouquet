@@ -30,6 +30,7 @@ const appPresenter = new AppPresenter(
   filterModel
 );
 
+appPresenter.init();
 bouquetsModel.init();
 deferredModel.init();
-appPresenter.init();
+

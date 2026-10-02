@@ -85,22 +85,47 @@ const Method = {
 
 const CatalogueMessageType = {
   EMPTY: 'EMPTY',
-  ERROR_BOUQUETS: 'ERROR_BOUQUETS',
-  ERROR_UPDATE_DEFERRED: 'ERROR_UPDATE_DEFERRED',
-  ERROR_MODAL: 'ERROR_MODAL',
+}
+
+const CatalogueMessage = {
+  [CatalogueMessageType.EMPTY]: 'К сожалению, таких букетов у нас пока нет',
+}
+
+const ErrorType = {
+  LOAD_BOUQUETS: 'LOAD_BOUQUETS',
+  LOAD_DEFERRED: 'LOAD_DEFERRED',
+  ADD_DEFERRED: 'ADD_DEFERRED',
+  DELETE_DEFERRED: 'DELETE_DEFERRED',
+  CLEAN_CARD_DEFERRED: 'CLEAN_CARD_DEFERRED',
+  CLEAN_ALL_DEFERRED: 'CLEAN_ALL_DEFERRED',
+  LOAD_MODAL: 'LOAD_MODAL',
+  SYNC_DEFERRED: 'SYNC_DEFERRED',
 }
 
 const ErrorMessage = {
-  [CatalogueMessageType.EMPTY]: 'К сожалению, таких букетов у нас пока нет',
-  [CatalogueMessageType.ERROR_BOUQUETS]: 'К сожалению, нам не удалось загрузить букеты. Попробуйте ещё раз',
-  [CatalogueMessageType.ERROR_UPDATE_DEFERRED]: 'Не удалось изменить отложенные. Попробуйте ещё раз.',
-  [CatalogueMessageType.ERROR_MODAL]: 'Не удалось загрузить информацию о букете. Попробуйте ещё раз.',
-};
+  [ErrorType.LOAD_BOUQUETS]:
+    'К сожалению, нам не удалось загрузить букеты. Попробуйте ещё раз',
 
-const DeferredErrorType = {
-  CLEAN_ALL: 'CLEAN_ALL',
-  SYNC: 'SYNC',
-  CLEAN_CARD: 'CLEAN_CARD',
+  [ErrorType.LOAD_DEFERRED]:
+    'Не удалось загрузить отложенные. Попробуйте ещё раз.',
+
+  [ErrorType.ADD_DEFERRED]:
+    'Не удалось добавить букет в отложенные. Попробуйте ещё раз.',
+
+  [ErrorType.DELETE_DEFERRED]:
+    'Не удалось удалить букет из отложенных. Попробуйте ещё раз.',
+
+  [ErrorType.CLEAN_CARD_DEFERRED]:
+    'Не удалось удалить все экземпляры этого букета. Попробуйте ещё раз.',
+
+  [ErrorType.CLEAN_ALL_DEFERRED]:
+    'Не удалось очистить отложенные. Попробуйте ещё раз.',
+
+  [ErrorType.LOAD_MODAL]:
+    'Не удалось загрузить информацию о букете. Попробуйте ещё раз.',
+
+  [ErrorType.SYNC_DEFERRED]:
+    'Не удалось синхронизировать отложенные. Попробуйте ещё раз.',
 };
 
 export {
@@ -117,6 +142,7 @@ export {
   UpdateType,
   Method,
   CatalogueMessageType,
+  CatalogueMessage,
+  ErrorType,
   ErrorMessage,
-  DeferredErrorType
 };

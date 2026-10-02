@@ -1,6 +1,5 @@
 import Observable from '../framework/observable.js';
-import {deferredBoquets} from '../mock/deferred-bouquets.js';
-import {UpdateType, DeferredErrorType} from '../const.js';
+import {UpdateType, ErrorType} from '../const.js';
 
 const createEmptyDeferred = () => ({
   products: {},
@@ -9,10 +8,10 @@ const createEmptyDeferred = () => ({
 });
 
 export default class DeferredModel extends Observable {
-  #deferredBouquets = deferredBoquets;
   #deferred = createEmptyDeferred();
   #apiService = null;
   #isLoaded = false;
+  #isLoadError = false;
 
   constructor(apiService) {
     super();
@@ -20,16 +19,16 @@ export default class DeferredModel extends Observable {
   }
 
   init = async () => {
-    try {
-      this.#deferred = await this.#apiService.get();
+    this.#isLoadError = false;
 
-      if (Object.keys(this.#deferred).length === 0) {
-        this.#deferred = createEmptyDeferred();
-      }
+    try {
+      this.#deferred = this.#normalizeDeferred(
+        await this.#apiService.get()
+      );
     } catch {
       this.#deferred = createEmptyDeferred();
+      this.#isLoadError = true;
       this._notify(UpdateType.ERROR_LOAD_DEFERRED);
-
     }
 
     this.#isLoaded = true;
@@ -38,21 +37,25 @@ export default class DeferredModel extends Observable {
   }
 
   getActualDeferred = async () => {
-    const deferred = await this.#apiService.get();
-
-    if (Object.keys(deferred).length === 0) {
-      return createEmptyDeferred();
-    }
-
-    return deferred;
+    return this.#normalizeDeferred(
+      await this.#apiService.get()
+    );
   }
 
   get = () => this.#deferred;
 
   getIsLoaded = () => this.#isLoaded;
 
+  getIsLoadError = () => this.#isLoadError;
+
   has = (bouquetId) => {
     return Object.hasOwn(this.#deferred.products, bouquetId);
+  }
+
+  #normalizeDeferred(deferred) {
+    return Object.keys(deferred).length === 0
+      ? createEmptyDeferred()
+      : deferred;
   }
 
   #increment(updateType, bouquet, action = 'add') {
@@ -111,7 +114,9 @@ export default class DeferredModel extends Observable {
     } catch {
       this.#increment(updateType, bouquet, 'delete');
 
-      throw new Error('Can\'t add bouquet');
+      const error = new Error('Can\'t add bouquet');
+      error.type = ErrorType.ADD_DEFERRED;
+      throw error;
     }
   }
 
@@ -123,7 +128,9 @@ export default class DeferredModel extends Observable {
     } catch {
       this.#decrement(updateType, bouquet, 'add');
 
-      throw new Error('Can\'t delete bouquet');
+      const error = new Error('Can\'t delete bouquet');
+      error.type = ErrorType.DELETE_DEFERRED;
+      throw error;
     }
   }
 
@@ -157,12 +164,12 @@ export default class DeferredModel extends Observable {
       this._notify(updateType);
     } catch {
       const error = new Error('Can\'t synchronize deferred');
-      error.type = DeferredErrorType.SYNC;
+      error.type = ErrorType.SYNC_DEFERRED;
       throw error;
     }
 
     const error = new Error('Can\'t delete all bouquets');
-    error.type = DeferredErrorType.CLEAN_ALL;
+    error.type = ErrorType.CLEAN_ALL_DEFERRED;
     throw error;
   }
 
@@ -200,12 +207,12 @@ export default class DeferredModel extends Observable {
       this._notify(updateType);
     } catch {
       const error = new Error('Can\'t synchronize deferred');
-      error.type = DeferredErrorType.SYNC;
+      error.type = ErrorType.SYNC_DEFERRED;
       throw error;
     }
 
     const error = new Error('Can\'t delete this card');
-    error.type = DeferredErrorType.CLEAN_CARD;
+    error.type = ErrorType.CLEAN_CARD_DEFERRED;
     throw error;
   }
 

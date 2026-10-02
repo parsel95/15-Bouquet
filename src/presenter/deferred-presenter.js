@@ -13,7 +13,7 @@ import DeferredCardPresenter from './deferred-card-presenter.js';
 
 import {render, RenderPosition, remove, replace} from '../framework/render.js';
 import {setToZeroOpacity, setToFullOpacity} from '../utils/animation.js';
-import {UserAction, UpdateType, CatalogueMessageType, DeferredErrorType} from '../const.js';
+import {UserAction, UpdateType, ErrorType} from '../const.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 export default class DeferredPresenter {
@@ -62,6 +62,10 @@ export default class DeferredPresenter {
 
   init() {
     this.#renderDeferredPage();
+
+    if (this.#deferredModel.getIsLoadError()) {
+      this.#renderDeferredLoadError();
+    }
   }
 
   #renderHeroBlock() {
@@ -69,7 +73,7 @@ export default class DeferredPresenter {
     this.#heroDeferredComponent.setCloseClickHandler(this.#handleBackToMain);
   }
 
-  #renderDeferredItems(time = 0) {
+  #renderDeferredItems() {
     const bouquets = this.bouquets;
     const deferred = this.deferred;
 
@@ -102,7 +106,7 @@ export default class DeferredPresenter {
   }
 
   #renderDeferredErrorModal(type) {
-    this.#deferredErrorModalComponent.setText(type)
+    this.#deferredErrorModalComponent.setText(type);
     render(this.#deferredErrorModalComponent, this.#mainContainer);
     this.#deferredErrorModalComponent.setClickHandler(this.#handleErrorModalClose);
     document.addEventListener('keydown', this.#onEscKeyDown);
@@ -114,11 +118,13 @@ export default class DeferredPresenter {
     document.removeEventListener('keydown', this.#onEscKeyDown);
   }
 
-  #renderDeferredLoadError = () => {
-    render(this.#loadErrorDeferredComponent, this.#bodyContainer);
+#renderDeferredLoadError = (type) => {
+  this.#loadErrorDeferredComponent.setText(type);
 
-    this.#loadErrorDeferredComponent.setClickHandler(this.#handleDeferredLoadError);
-  }
+  render(this.#loadErrorDeferredComponent, this.#bodyContainer);
+
+  this.#loadErrorDeferredComponent.setClickHandler(this.#handleDeferredLoadError);
+}
 
   #handleDeferredLoadError = async () => {
     remove(this.#loadErrorDeferredComponent);
@@ -171,10 +177,10 @@ export default class DeferredPresenter {
           break;
       }
     } catch (error) {
-      if (error.type === DeferredErrorType.SYNC) {
-        this.#renderDeferredLoadError();
+      if (error.type === ErrorType.SYNC_DEFERRED) {
+        this.#renderDeferredLoadError(ErrorType.SYNC_DEFERRED);
       } else {
-        this.#renderDeferredErrorModal(CatalogueMessageType.ERROR_UPDATE_DEFERRED);
+        this.#renderDeferredErrorModal(error.type);
       }
     } finally {
       uiBlocker.unblock();
