@@ -72,26 +72,33 @@ export default class ModalView extends AbstractView {
   setCloseClickHandler = (callback) => {
     this._callback.closeClick = callback;
     this.element.querySelector('.modal-product__btn-close').addEventListener('click', this.#closeClickHandler);
-  }
+  };
 
   setDeferredClickHandler = (callback) => {
     this._callback.deferredClick = callback;
     this.element.querySelector('.product-description__button').addEventListener('click', this.#deferredClickHandler);
-  }
+  };
 
   updateDeferredStatus(isDeferred) {
     this.#isDeferred = isDeferred;
     const button = this.element.querySelector('.product-description__button');
-    button.textContent = this.#isDeferred ? `отложено` : `отложить`;
+    button.textContent = this.#isDeferred ? 'отложено' : 'отложить';
   }
 
   #closeClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.closeClick();
-  }
+  };
 
   #deferredClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.deferredClick();
+  };
+
+  destroy() {
+    if (this.#slider) {
+      this.#slider.destroy();
+      this.#slider = null;
+    }
   }
 }

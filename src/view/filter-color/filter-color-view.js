@@ -43,5 +43,5 @@ export default class FilterColorView extends AbstractView {
   #filterTypeChangeHandler = (evt) => {
     evt.preventDefault();
     this._callback.filterTypeChange(evt.target.dataset.filterColor);
-  }
+  };
 }

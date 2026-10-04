@@ -43,11 +43,11 @@ export default class FilterReasonPresenter {
 
   #handleModelEvent = () => {
     this.init();
-  }
+  };
 
   #filterTypeChangeHandler = (filterType) => {
     this.#filterModel.setReasonFilter(UpdateType.MINOR, filterType);
-  }
+  };
 
   destroy() {
     this.#filterModel.removeObserver(this.#handleModelEvent);

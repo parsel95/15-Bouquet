@@ -5,7 +5,7 @@ const ReasonType = {
   MOTHER: 'mother',
   COLLEAGUE: 'colleague',
   DARLING: 'darling',
-}
+};
 
 const ReasonTypeText = {
   [ReasonType.ALL]: 'Для всех',
@@ -14,7 +14,7 @@ const ReasonTypeText = {
   [ReasonType.MOTHER]: 'Маме',
   [ReasonType.COLLEAGUE]: 'Коллеге',
   [ReasonType.DARLING]: 'Любимой',
-}
+};
 
 const ColorType = {
   ALL: 'all',
@@ -23,7 +23,7 @@ const ColorType = {
   LILAC: 'lilac',
   YELLOW: 'yellow',
   PINK: 'pink',
-}
+};
 
 const ColorTypeText = {
   [ColorType.ALL]: 'все цвета',
@@ -32,14 +32,14 @@ const ColorTypeText = {
   [ColorType.LILAC]: 'сиреневый',
   [ColorType.YELLOW]: 'жёлтый',
   [ColorType.PINK]: 'розовый',
-}
+};
 
 const LabelType = {
-  birthday: "имениннику",
-  darling: "любимой",
-  bride: "невесте",
-  colleague: "коллеге",
-  mother: "маме",
+  birthday: 'имениннику',
+  darling: 'любимой',
+  bride: 'невесте',
+  colleague: 'коллеге',
+  mother: 'маме',
 };
 
 const LogoConfig = {
@@ -52,21 +52,20 @@ const logoParentName = 'FOOTER';
 const Page = {
   MAIN: 'MAIN',
   DEFERRED: 'DEFERRED'
-}
+};
 
 const SortType = {
   PRICE_UP: 'price-up',
   PRICE_DOWN: 'price-down',
-}
+};
 
 const UserAction = {
-  UPDATE_BOUQUET: 'UPDATE_BOUQUET',
-  ADD_BOUQUET: 'ADD_BOUQUET',
-  DELETE_BOUQUET: 'DELETE_BOUQUET',
-  INCREMENT_BOUQUET: 'INCREMENT_BOUQUET',
-  DECREMENT_BOUQUET: 'DECREMENT_BOUQUET',
-  CLEAN_ALL_BOUQUETS: 'CLEAN_ALL_BOUQUETS',
-}
+  TOGGLE_DEFERRED: 'TOGGLE_DEFERRED',
+  INCREMENT_DEFERRED: 'INCREMENT_DEFERRED',
+  DECREMENT_DEFERRED: 'DECREMENT_DEFERRED',
+  REMOVE_DEFERRED_ITEM: 'REMOVE_DEFERRED_ITEM',
+  CLEAR_DEFERRED: 'CLEAR_DEFERRED',
+};
 
 const UpdateType = {
   PATCH: 'PATCH',
@@ -75,7 +74,7 @@ const UpdateType = {
   INIT: 'INIT',
   LOADING: 'LOADING',
   ERROR_LOAD_DEFERRED: 'ERROR_LOAD_DEFERRED',
-}
+};
 
 const Method = {
   GET: 'GET',
@@ -85,11 +84,11 @@ const Method = {
 
 const CatalogueMessageType = {
   EMPTY: 'EMPTY',
-}
+};
 
 const CatalogueMessage = {
   [CatalogueMessageType.EMPTY]: 'К сожалению, таких букетов у нас пока нет',
-}
+};
 
 const ErrorType = {
   LOAD_BOUQUETS: 'LOAD_BOUQUETS',
@@ -100,7 +99,7 @@ const ErrorType = {
   CLEAN_ALL_DEFERRED: 'CLEAN_ALL_DEFERRED',
   LOAD_MODAL: 'LOAD_MODAL',
   SYNC_DEFERRED: 'SYNC_DEFERRED',
-}
+};
 
 const ErrorMessage = {
   [ErrorType.LOAD_BOUQUETS]:

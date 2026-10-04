@@ -1,11 +1,7 @@
-import AbstractView from '../../framework/view/abstract-view.js';
-
 export const createModalSliderImgTemplate = (picture, authorPhoto, index) => {
-  const getAuthorElement = (authorPhoto, index) => {
-    return index === 0 ?
-      `<span class="image-author image-slide__author">Автор  фотографии: «${authorPhoto}»</span>`
-      : '0';
-  };
+  const getAuthorElement = (author, idx) => idx === 0 ?
+    `<span class="image-author image-slide__author">Автор  фотографии: «${author}»</span>`
+    : '0';
 
   return `
     <div class="image-slides-list__item swiper-slide">
@@ -15,6 +11,6 @@ export const createModalSliderImgTemplate = (picture, authorPhoto, index) => {
       </div>
     </div>
   `;
-}
+};
 
 

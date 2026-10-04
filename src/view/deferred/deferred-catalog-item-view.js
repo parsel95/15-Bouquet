@@ -63,32 +63,32 @@ export default class DeferredCatalogItemView extends AbstractView {
     this._callback.decrementClick = callback;
 
     this.element.querySelector('.btn-calculate--minus').addEventListener('click', this.#decrementClickHandler);
-  }
+  };
 
   setIncrementClickHandler = (callback) => {
     this._callback.incrementClick = callback;
 
     this.element.querySelector('.btn-calculate--plus').addEventListener('click', this.#incrementClickHandler);
-  }
+  };
 
   setCloseBtnClickHandler = (callback) => {
     this._callback.closeBtnClick = callback;
 
     this.element.querySelector('.btn-close').addEventListener('click', this.#closeBtnClick);
-  }
+  };
 
   #decrementClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.decrementClick();
-  }
+  };
 
   #incrementClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.incrementClick();
-  }
+  };
 
   #closeBtnClick = (evt) => {
     evt.preventDefault();
     this._callback.closeBtnClick();
-  }
+  };
 }

@@ -30,7 +30,7 @@ export default class BouquetsModel extends Observable {
 
     this.#isLoaded = true;
     this._notify(UpdateType.INIT);
-  }
+  };
 
   get = () => this.#bouquets;
 
@@ -40,36 +40,34 @@ export default class BouquetsModel extends Observable {
 
   getById = (id) => this.#apiService.getById(id);
 
-  #adaptToClient = (bouquet) => {
-    return {
-      ...bouquet,
-      type: this.#adaptType(bouquet.type),
-      color: this.#adaptColor(bouquet.color),
-    }
-  }
+  #adaptToClient = (bouquet) => ({
+    ...bouquet,
+    type: this.#adaptType(bouquet.type),
+    color: this.#adaptColor(bouquet.color),
+  });
 
   #adaptType = (type) => {
     switch (type) {
-      case "birthdayboy":
-        return "birthday";
-      case "forlove":
-        return "darling";
-      case "bridge":
-        return "bride";
-      case "colleagues":
-        return "colleague";
-      case "motherday":
-        return "mother";
+      case 'birthdayboy':
+        return 'birthday';
+      case 'forlove':
+        return 'darling';
+      case 'bridge':
+        return 'bride';
+      case 'colleagues':
+        return 'colleague';
+      case 'motherday':
+        return 'mother';
       default:
         return type;
     }
-  }
+  };
 
   #adaptColor = (color) => {
-    if (color === "violet") {
-      return "lilac";
+    if (color === 'violet') {
+      return 'lilac';
     } else {
       return color;
     }
-  }
+  };
 }

@@ -6,16 +6,12 @@ export default class HeaderCountPresenter {
   #headerCountComponent = null;
 
   #container = null;
-  #bodyContainer = null;
-  #bouquetsModel = null;
   #deferredModel = null;
 
   #handleOpenDeferred = null;
 
-  constructor(container, bodyContainer, bouquetsModel, deferredModel, handleOpenDeferred) {
+  constructor(container, deferredModel, handleOpenDeferred) {
     this.#container = container;
-    this.#bodyContainer = bodyContainer;
-    this.#bouquetsModel = bouquetsModel;
     this.#deferredModel = deferredModel;
     this.#handleOpenDeferred = handleOpenDeferred;
 
@@ -38,7 +34,7 @@ export default class HeaderCountPresenter {
 
     replace(this.#headerCountComponent, prevComponent);
     remove(prevComponent);
-  }
+  };
 
   #renderHeaderCount() {
     if (!this.#headerCountComponent) {
@@ -46,5 +42,10 @@ export default class HeaderCountPresenter {
       render(this.#headerCountComponent, this.#container);
       this.#headerCountComponent.setClickHandler(this.#handleOpenDeferred);
     }
+  }
+
+  destroy() {
+    this.#deferredModel.removeObserver(this.#handleModelEvent);
+    remove(this.#headerCountComponent);
   }
 }

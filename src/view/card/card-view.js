@@ -3,11 +3,9 @@ import {createCardButtonHeartTemplate} from './card-button-heart-template.js';
 import {LabelType} from '../../const.js';
 
 const createCardViewTemplate = ({title, description, type, price, previewImage}, isDeferred) => {
-  const getLabelText = (type) => {
-    return LabelType[type] || '';
-  }
+  const getLabelText = (typeValue) => LabelType[typeValue] || '';
 
-  const getFavoriteClass = (isDeferred) => isDeferred ? 'is-favorite' : '';
+  const getFavoriteClass = (deferred) => deferred ? 'is-favorite' : '';
 
   return `
     <li class="catalogue__item">
@@ -39,7 +37,7 @@ const createCardViewTemplate = ({title, description, type, price, previewImage},
       </div>
     </li>
   `;
-}
+};
 
 export default class CardView extends AbstractView {
   #bouquet = null;
@@ -58,20 +56,20 @@ export default class CardView extends AbstractView {
   setOpenClickHandler = (callback) => {
     this._callback.openClick = callback;
     this.element.querySelector('.item-card__btn').addEventListener('click', this.#openClickHandler);
-  }
+  };
 
   setDeferredClickHandler = (callback) => {
     this._callback.deferredClick = callback;
     this.element.querySelector('.button-heart').addEventListener('click', this.#deferredClickHandler);
-  }
+  };
 
   #openClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.openClick();
-  }
+  };
 
   #deferredClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.deferredClick();
-  }
+  };
 }

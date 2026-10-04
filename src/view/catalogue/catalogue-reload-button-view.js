@@ -16,14 +16,14 @@ export default class CatalogueReloadButtonView extends AbstractView {
     this._callback.click = callback;
 
     this.element.addEventListener('click', this.#clickHandler);
-  }
+  };
 
   removeClickHandler = () => {
     this.element.removeEventListener('click', this.#clickHandler);
-  }
+  };
 
   #clickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
-  }
+  };
 }

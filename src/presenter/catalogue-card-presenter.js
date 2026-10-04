@@ -44,11 +44,11 @@ export default class CatalogueCardPresenter {
 
   #handleDeferredClick = () => {
     this.#changeData(
-      UserAction.UPDATE_BOUQUET,
+      UserAction.TOGGLE_DEFERRED,
       UpdateType.PATCH,
       {...this.#bouquet}
     );
-  }
+  };
 
   destroy() {
     remove(this.#cardComponent);

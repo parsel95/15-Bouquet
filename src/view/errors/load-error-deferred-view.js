@@ -1,5 +1,5 @@
-import AbstractView from '../framework/view/abstract-view.js';
-import {ErrorMessage} from '../const.js';
+import AbstractView from '../../framework/view/abstract-view.js';
+import {ErrorMessage} from '../../const.js';
 
 const createLoadErrorDeferredTemplate = () => `
   <div class="load-error-deferred" role="alertdialog" aria-modal="true">
@@ -27,19 +27,19 @@ export default class LoadErrorDeferredView extends AbstractView {
 
   setText = (type) => {
     this.element.querySelector('.load-error-deferred__text').textContent = ErrorMessage[type];
-  }
+  };
 
   setClickHandler = (callback) => {
     this._callback.click = callback;
     this.element.querySelector('.load-error-deferred__button').addEventListener('click', this.#clickHandler);
-  }
+  };
 
   removeClickHandler = () => {
     this.element.querySelector('.load-error-deferred__button').removeEventListener('click', this.#clickHandler);
-  }
+  };
 
   #clickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
-  }
+  };
 }

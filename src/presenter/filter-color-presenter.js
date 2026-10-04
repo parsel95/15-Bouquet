@@ -43,11 +43,11 @@ export default class FilterColorPresenter {
 
   #handleModelEvent = () => {
     this.init();
-  }
+  };
 
   #filterTypeChangeHandler = (filterType) => {
     this.#filterModel.toggleColorFilter(UpdateType.MINOR, filterType);
-  }
+  };
 
   destroy() {
     this.#filterModel.removeObserver(this.#handleModelEvent);

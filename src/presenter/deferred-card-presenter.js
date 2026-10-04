@@ -41,34 +41,34 @@ export default class DeferredCardPresenter {
   #handleDecrementClick = (count) => {
     if (count === 1) {
       this.#changeData(
-        UserAction.DELETE_BOUQUET,
+        UserAction.DECREMENT_DEFERRED,
         UpdateType.MINOR,
         {...this.#bouquet}
       );
     } else {
       this.#changeData(
-        UserAction.DELETE_BOUQUET,
+        UserAction.DECREMENT_DEFERRED,
         UpdateType.PATCH,
         {...this.#bouquet}
       );
     }
-  }
+  };
 
   #handleIncrementClick = () => {
     this.#changeData(
-      UserAction.INCREMENT_BOUQUET,
+      UserAction.INCREMENT_DEFERRED,
       UpdateType.PATCH,
       {...this.#bouquet}
     );
-  }
+  };
 
   #handleCloseBtnClick = () => {
     this.#changeData(
-      UserAction.DELETE_CARD_BOUQUET,
+      UserAction.REMOVE_DEFERRED_ITEM,
       UpdateType.MINOR,
       {...this.#bouquet}
     );
-  }
+  };
 
   destroy() {
     remove(this.#cardComponent);

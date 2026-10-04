@@ -16,5 +16,5 @@ export default class CatalogueEmptyListView extends AbstractView {
 
   setText = (text) => {
     this.element.querySelector('p').textContent = text;
-  }
+  };
 }

@@ -1,11 +1,7 @@
-// Импорт вендоров и утилит, не удаляйте его
 import AppPresenter from './presenter/app-presenter.js';
 import BouquetsModel from './model/bouquets-model.js';
 import DeferredModel from './model/deferred-model.js';
 import FilterModel from './model/filter-model.js';
-
-import ImageSlider from './utils/image-slider.js';
-import {render, RenderPosition} from './framework/render.js';
 
 import BouquetsApiService from './api-services/bouquets-api-service.js';
 import DeferredApiService from './api-services/deferred-api-service.js';

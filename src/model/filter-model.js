@@ -16,7 +16,7 @@ export default class FilterModel extends Observable {
   resetFilters = () => {
     this.#reasonFilter = ReasonType.ALL;
     this.#colorFilters = [ColorType.ALL];
-  }
+  };
 
   setReasonFilter = (updateType, reasonFilter) => {
     if (this.#reasonFilter === reasonFilter) {
@@ -25,15 +25,15 @@ export default class FilterModel extends Observable {
 
     this.#reasonFilter = reasonFilter;
     this._notify(updateType, reasonFilter);
-  }
+  };
 
   #addColorFilter = (colorFilter) => {
     this.#colorFilters.push(colorFilter);
-  }
+  };
 
   #deleteColorFilter = (colorFilter) => {
     this.#colorFilters = this.#colorFilters.filter((filter) => filter !== colorFilter);
-  }
+  };
 
   toggleColorFilter = (updateType, colorFilter) => {
     if (colorFilter === ColorType.ALL) {
@@ -53,7 +53,7 @@ export default class FilterModel extends Observable {
 
     this.#toggleColorInSelection(colorFilter);
     this._notify(updateType, colorFilter);
-  }
+  };
 
   #toggleColorInSelection = (colorFilter) => {
     if (!this.#colorFilters.includes(colorFilter)) {
@@ -65,5 +65,5 @@ export default class FilterModel extends Observable {
     if (this.#colorFilters.length === 0) {
       this.#addColorFilter(ColorType.ALL);
     }
-  }
+  };
 }

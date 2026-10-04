@@ -28,10 +28,10 @@ export default class HeroView extends AbstractView {
   setCloseClickHandler = (callback) => {
     this._callback.click = callback;
     this.element.querySelector('.btn-close').addEventListener('click', this.#closeClickHandler);
-  }
+  };
 
   #closeClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
-  }
+  };
 }

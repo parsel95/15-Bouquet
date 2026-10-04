@@ -44,11 +44,11 @@ export default class ModalPresenter {
 
   #handleDeferredClick = () => {
     this.#changeData(
-      UserAction.UPDATE_BOUQUET,
+      UserAction.TOGGLE_DEFERRED,
       UpdateType.PATCH,
       {...this.#bouquet}
     );
-  }
+  };
 
   modalElement() {
     return this.#modalComponent.element;
@@ -60,6 +60,7 @@ export default class ModalPresenter {
   }
 
   destroy() {
+    this.#modalComponent.destroy();
     remove(this.#modalComponent);
   }
 }

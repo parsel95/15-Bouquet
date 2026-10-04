@@ -5,9 +5,9 @@ import CatalogueEmptyListView from '../view/catalogue/catalogue-empty-list.js';
 import LoadMoreButtonView from '../view/catalogue/catalogue-load-more-button-view.js';
 import CatalogueReloadButtonView from '../view/catalogue/catalogue-reload-button-view.js';
 import ScrollToTopButtonView from '../view/catalogue/catalogue-scroll-to-top-button-view.js';
-import ErrorModalView from '../view/error-modal-view.js';
+import ErrorModalView from '../view/errors/error-modal-view.js';
 import CatalogueListLoadingView from '../view/catalogue/catalogue-list-loading-view.js';
-import LoadErrorDeferredView from '../view/load-error-deferred-view.js';
+import LoadErrorDeferredView from '../view/errors/load-error-deferred-view.js';
 
 import CatalogueCardPresenter from './catalogue-card-presenter.js';
 import ModalPresenter from './modal-presenter.js';
@@ -16,7 +16,7 @@ import {render, RenderPosition, remove, replace} from '../framework/render.js';
 import {setToZeroOpacity, setToFullOpacity} from '../utils/animation.js';
 import {sortBouquetsByPriceUp, sortBouquetsByPriceDown} from '../utils/common.js';
 import ScrollLock from '../utils/scroll-lock.js';
-import {SortType, UserAction, UpdateType, ErrorType} from '../const.js';
+import {SortType, UserAction, UpdateType, CatalogueMessage, CatalogueMessageType, ErrorType, ErrorMessage} from '../const.js';
 import {filterReason, filterColor} from '../utils/filter.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
@@ -121,7 +121,7 @@ export default class CataloguePresenter {
   }
 
   #handleViewAction = async (actionType, updateType, updateBouquet) => {
-    if (actionType === UserAction.UPDATE_BOUQUET) {
+    if (actionType === UserAction.TOGGLE_DEFERRED) {
       this.#uiBlocker.block();
 
       try {
@@ -132,7 +132,7 @@ export default class CataloguePresenter {
         this.#uiBlocker.unblock();
       }
     }
-  }
+  };
 
   #handleUpdateBouquet(updateType, updatedBouquet) {
     return this.#deferredModel.toggleDeferred(updateType, updatedBouquet);
@@ -155,7 +155,7 @@ export default class CataloguePresenter {
     }
 
     this.#isErrorModalOpen = false;
-  }
+  };
 
   #handleBouquetsModelEvent = (updateType) => {
     switch (updateType) {
@@ -166,7 +166,7 @@ export default class CataloguePresenter {
         this.#handleBouquetsLoading();
         break;
     }
-  }
+  };
 
   #handleBouquetsInit() {
     this.#isBouquetsLoading = !this.#bouquetsModel.getIsLoaded();
@@ -200,7 +200,7 @@ export default class CataloguePresenter {
       case UpdateType.ERROR_LOAD_DEFERRED:
         this.#renderDeferredLoadError(ErrorType.LOAD_DEFERRED);
     }
-  }
+  };
 
   #handlePatch(data) {
     this.#updateCard(data);
@@ -211,14 +211,14 @@ export default class CataloguePresenter {
     if (this.#cardPresenters.has(updatedBouquet.id)) {
       this.#cardPresenters.get(updatedBouquet.id).init(updatedBouquet);
     }
-  }
+  };
 
   #updateModal = (updatedBouquet) => {
     if (this.#modalPresenter && this.#selectedBouquet.id === updatedBouquet.id) {
       this.#selectedBouquet = updatedBouquet;
       this.#modalPresenter.updateDeferredStatus();
     }
-  }
+  };
 
   #handleDeferredInit() {
     this.#isDeferredLoading = !this.#deferredModel.getIsLoaded();
@@ -236,7 +236,7 @@ export default class CataloguePresenter {
     render(this.#loadErrorDeferredComponent, this.#bodyContainer);
 
     this.#loadErrorDeferredComponent.setClickHandler(this.#handleDeferredLoadError);
-  }
+  };
 
   #handleDeferredLoadError = async () => {
     remove(this.#loadErrorDeferredComponent);
@@ -249,7 +249,7 @@ export default class CataloguePresenter {
     } finally {
       this.#uiBlocker.unblock();
     }
-  }
+  };
 
   #handleFilterModelEvent = (updateType) => {
     if (this.#isBouquetsLoadError) {
@@ -259,7 +259,7 @@ export default class CataloguePresenter {
     if (updateType === UpdateType.MINOR) {
       this.#handleMinor();
     }
-  }
+  };
 
   #handleMinor() {
     this.#clearCatalogueList();
@@ -289,7 +289,7 @@ export default class CataloguePresenter {
     if (this.#renderedBouquetsCount >= bouquetsCount) {
       remove(this.#loadMoreButtonComponent);
     }
-  }
+  };
 
   #handleSortTypeChange = (sortType) => {
     if (this.#currentSortType === sortType) {
@@ -302,7 +302,7 @@ export default class CataloguePresenter {
     this.#clearCatalogueList();
     this.#renderSorting(this.#catalogueComponent.getSortingContainer());
     this.#renderCatalogueList(bouquets, this.#catalogueComponent.getButtonsContainer());
-  }
+  };
 
   #renderSorting(container) {
     if (!this.#sortingComponent) {
@@ -395,7 +395,7 @@ export default class CataloguePresenter {
     setTimeout(() => {
       setToFullOpacity(this.#modalPresenter.modalElement());
     }, time);
-  }
+  };
 
   #handleCloseModal = (time = 500) => {
     setToZeroOpacity(this.#modalPresenter.modalElement(), 0.5);
@@ -410,7 +410,7 @@ export default class CataloguePresenter {
 
       setToFullOpacity(this.#catalogueComponent.element);
     }, time);
-  }
+  };
 
   #renderModal() {
     if (!this.#modalPresenter) {
@@ -492,7 +492,7 @@ export default class CataloguePresenter {
 
       this.#handleCloseModal();
     }
-  }
+  };
 
   destroy() {
     document.removeEventListener('keydown', this.#onEscKeyDown);

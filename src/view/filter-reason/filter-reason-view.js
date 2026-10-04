@@ -43,6 +43,6 @@ export default class FilterReasonView extends AbstractView {
   #filterTypeChangeHandler = (evt) => {
     evt.preventDefault();
     this._callback.filterTypeChange(evt.target.dataset.filterReason);
-  }
+  };
 }
 

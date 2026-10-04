@@ -17,6 +17,7 @@ export default class DeferredCleanButtonView extends AbstractView {
     return createDeferredCleanButtonTemplate();
   }
 
+  // eslint-disable-next-line accessor-pairs
   set buttonText(isCleaning) {
     this.#isCleaning = isCleaning;
     this.#changeButtonText();
@@ -25,17 +26,16 @@ export default class DeferredCleanButtonView extends AbstractView {
   #changeButtonText() {
     this.element.querySelector('.popup-deferred__btn-clean-text').textContent =
       this.#isCleaning ? 'очищаем...' : 'очистить';
-    ;
   }
 
   setClickHandler = (callback) => {
     this._callback.click = callback;
 
     this.element.addEventListener('click', this.#clickHandler);
-  }
+  };
 
   #clickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
-  }
+  };
 }

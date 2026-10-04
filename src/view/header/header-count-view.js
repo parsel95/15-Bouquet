@@ -26,7 +26,7 @@ const createHeaderCountViewTemplate = ({productCount, sum}) =>
 
 export default class HeaderCountView extends AbstractView {
   #deferred = null;
- 
+
   constructor(deferred) {
     super();
     this.#deferred = deferred;
@@ -40,10 +40,10 @@ export default class HeaderCountView extends AbstractView {
     this._callback.click = callback;
 
     this.element.addEventListener('click', this.#clickHandler);
-  }
+  };
 
   #clickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
-  }
+  };
 }

@@ -1,7 +1,7 @@
 import AbstractView from '../../framework/view/abstract-view';
 import './ui-blocker.css';
 
-const createUiBlockerTemplate = () => `<div class="ui-blocker"></div>`;
+const createUiBlockerTemplate = () => '<div class="ui-blocker"></div>';
 
 /**
  * Класс для блокировки интерфейса

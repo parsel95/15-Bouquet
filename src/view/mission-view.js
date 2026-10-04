@@ -26,6 +26,3 @@ export default class MissionView extends AbstractView {
     return createMissionViewTemplate();
   }
 }
-
-
-

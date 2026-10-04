@@ -6,16 +6,12 @@ export default class DeferredApiService extends ApiService {
     .then(ApiService.parseResponse);
 
   add = async (bouquet) => {
-    const response = await this._load({
+    await this._load({
       url: `flowers-shop/products/${bouquet.id}`,
       method: Method.PUT,
       headers: new Headers({'Content-Type': 'application/json'})
     });
-
-    const parsedResponse = await ApiService.parseResponse(response);
-
-    return parsedResponse;
-  }
+  };
 
   delete = async (bouquetId) => {
     await this._load({
@@ -23,5 +19,5 @@ export default class DeferredApiService extends ApiService {
       method: Method.DELETE,
       headers: new Headers({'Content-Type': 'application/json'})
     });
-  }
+  };
 }

@@ -1,5 +1,5 @@
-import AbstractView from '../framework/view/abstract-view.js';
-import {ErrorMessage} from '../const.js';
+import AbstractView from '../../framework/view/abstract-view.js';
+import {ErrorMessage} from '../../const.js';
 
 const createErrorModalTemplate = () => `
   <div class="error-modal" role="alertdialog" aria-modal="true">
@@ -25,21 +25,21 @@ export default class ErrorModalView extends AbstractView {
     return createErrorModalTemplate();
   }
 
-setText = (type) => {
-  this.element.querySelector('.error-modal__text').textContent = ErrorMessage[type];
-}
+  setText = (type) => {
+    this.element.querySelector('.error-modal__text').textContent = ErrorMessage[type];
+  };
 
   setClickHandler = (callback) => {
     this._callback.click = callback;
     this.element.querySelector('.error-modal__button').addEventListener('click', this.#clickHandler);
-  }
+  };
 
   removeClickHandler = () => {
     this.element.querySelector('.error-modal__button').removeEventListener('click', this.#clickHandler);
-  }
+  };
 
   #clickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
-  }
+  };
 }

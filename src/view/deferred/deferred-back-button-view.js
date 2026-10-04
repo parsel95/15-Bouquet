@@ -18,10 +18,10 @@ export default class DeferredBackButtonView extends AbstractView {
     this._callback.click = callback;
 
     this.element.addEventListener('click', this.#clickHandler);
-  }
+  };
 
   #clickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
-  }
+  };
 }

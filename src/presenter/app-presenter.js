@@ -30,6 +30,7 @@ export default class AppPresenter {
   #mainScrollPosition = null;
   #renderedBouquetsCount = null;
   #savedSortType = null;
+  #isSwitchingPage = false;
 
   constructor(
     bodyContainer,
@@ -54,8 +55,6 @@ export default class AppPresenter {
 
     this.#headerCountPresenter = new HeaderCountPresenter(
       this.#headerComponent.headerContainer,
-      this.#bodyContainer,
-      this.#bouquetsModel,
       this.#deferredModel,
       () => this.#switchPage(Page.DEFERRED)
     );
@@ -125,6 +124,10 @@ export default class AppPresenter {
   }
 
   #switchPage = (targetPage, shouldRestore = false, time = 400) => {
+    if (this.#isSwitchingPage) {
+      return;
+    }
+
     if (this.#mainPagePresenter) {
       this.#mainScrollPosition = window.scrollY;
       this.#renderedBouquetsCount = this.#mainPagePresenter.getRenderedBouquetsCount();
@@ -133,9 +136,14 @@ export default class AppPresenter {
 
     window.scrollTo(0, 0);
 
-    if (targetPage === Page.MAIN && this.#mainPagePresenter) return;
-    if (targetPage === Page.DEFERRED && this.#deferredPresenter) return;
+    if (targetPage === Page.MAIN && this.#mainPagePresenter) {
+      return;
+    }
+    if (targetPage === Page.DEFERRED && this.#deferredPresenter) {
+      return;
+    }
 
+    this.#isSwitchingPage = true;
     setToZeroOpacity(this.#mainContainer, 0.5);
 
     setTimeout(() => {
@@ -147,7 +155,8 @@ export default class AppPresenter {
         this.#renderDeferredPage();
       }
 
+      this.#isSwitchingPage = false;
       setToFullOpacity(this.#mainContainer);
     }, time);
-  }
+  };
 }
