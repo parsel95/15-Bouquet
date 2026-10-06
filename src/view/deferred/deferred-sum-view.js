@@ -21,6 +21,10 @@ const createDeferredSumTemplate = ({productCount, sum}) =>
     </div>
   `;
 
+/**
+ * Отображает агрегаты состояния отложенных: количество букетов
+ * и общую сумму, переданные моделью.
+ */
 export default class DeferredSumView extends AbstractView {
   #deferredBouquets = null;
 

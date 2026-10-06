@@ -2,6 +2,10 @@ import FilterReasonView from '../view/filter-reason/filter-reason-view.js';
 import {render, remove, replace} from '../framework/render.js';
 import {ReasonType, ReasonTypeText, UpdateType} from '../const.js';
 
+/**
+ * Связывает выбор повода в интерфейсе с состоянием FilterModel.
+ * По уведомлению модели обновляет View выбранного фильтра.
+ */
 export default class FilterReasonPresenter {
   #container = null;
   #filterReasonComponent = null;

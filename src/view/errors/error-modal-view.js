@@ -20,6 +20,11 @@ const createErrorModalTemplate = () => `
   </div>
 `;
 
+/**
+ * Отображает сообщение об ошибке операции.
+ * Получает ErrorType и выбирает соответствующий пользовательский текст
+ * из ErrorMessage; закрытие обрабатывает Presenter через callback.
+ */
 export default class ErrorModalView extends AbstractView {
   get template() {
     return createErrorModalTemplate();

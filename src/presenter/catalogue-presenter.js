@@ -22,6 +22,18 @@ import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 const BOUQUET_COUNT_PER_STEP = 6;
 
+/**
+ * Управляет отображением каталога и его взаимодействием с моделями.
+ *
+ * Список для показа вычисляется из каталога и состояния FilterModel,
+ * затем сортируется. Presenter также управляет постраничной загрузкой,
+ * состояниями загрузки и ошибок, карточками, модальным окном и действиями
+ * со списком отложенных.
+ *
+ * Выбранная сортировка и число показанных букетов хранятся здесь во время
+ * жизни Presenter-а; AppPresenter может сохранить их перед переключением
+ * страницы и передать новому экземпляру при возврате.
+ */
 export default class CataloguePresenter {
   #catalogueComponent = new CatalogueView();
   #sortingComponent = null;
@@ -298,6 +310,7 @@ export default class CataloguePresenter {
 
     this.#currentSortType = sortType;
 
+    // После смены порядка снова показываем первую порцию каталога.
     const bouquets = this.bouquets.slice(0, BOUQUET_COUNT_PER_STEP);
     this.#clearCatalogueList();
     this.#renderSorting(this.#catalogueComponent.getSortingContainer());

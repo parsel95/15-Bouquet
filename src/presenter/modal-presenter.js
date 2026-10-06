@@ -3,6 +3,16 @@ import {render, remove, replace} from '../framework/render.js';
 import {UserAction, UpdateType} from '../const.js';
 
 export default class ModalPresenter {
+  /**
+   * Управляет модальным окном с информацией о букете.
+   *
+   * Presenter отвечает за жизненный цикл модального окна:
+   * создание View, её обновление при смене букета
+   * и корректное уничтожение при закрытии.
+   *
+   * Сам Presenter не управляет DOM напрямую — для этого
+   * используются render(), replace() и remove().
+   */
   #modalComponent = null;
 
   #container = null;
@@ -20,6 +30,15 @@ export default class ModalPresenter {
     this.#handleCloseModal = handleCloseModal;
   }
 
+  /**
+   * Показывает модальное окно для переданного букета.
+   *
+   * При первом открытии создаётся новый ModalView.
+   * При смене букета существующее представление заменяется,
+   * после чего для нового View повторно инициализируется слайдер.
+   *
+   * @param {Object} bouquet Данные букета для отображения.
+   */
   init(bouquet) {
     this.#bouquet = bouquet;
 
@@ -38,7 +57,11 @@ export default class ModalPresenter {
     }
 
     replace(this.#modalComponent, prevModalComponent);
+
+    // Swiper работает с конкретным DOM-элементом,
+    // поэтому после замены View его нужно инициализировать заново.
     this.#modalComponent.initSlider();
+
     remove(prevModalComponent);
   }
 
@@ -59,6 +82,13 @@ export default class ModalPresenter {
     this.#modalComponent.updateDeferredStatus(isDeferred);
   }
 
+  /**
+   * Закрывает модальное окно и освобождает связанные ресурсы.
+   *
+   * Сначала View уничтожает свои дочерние ресурсы
+   * (например, экземпляр Swiper), после чего сам View
+   * удаляется из DOM.
+   */
   destroy() {
     this.#modalComponent.destroy();
     remove(this.#modalComponent);

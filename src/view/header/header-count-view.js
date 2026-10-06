@@ -24,6 +24,10 @@ const createHeaderCountViewTemplate = ({productCount, sum}) =>
     </div>
   `;
 
+/**
+ * Отображает количество и сумму отложенных букетов в шапке.
+ * Передаёт клик по блоку Presenter-у, который открывает страницу отложенных.
+ */
 export default class HeaderCountView extends AbstractView {
   #deferred = null;
 

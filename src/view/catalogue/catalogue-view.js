@@ -13,6 +13,10 @@ const createCatalogueTemplate = () =>
     </div>
   `;
 
+/**
+ * Корневой View каталога с отдельными контейнерами для сортировки
+ * и кнопок управления списком.
+ */
 export default class CatalogueView extends AbstractView {
   get template() {
     return createCatalogueTemplate();

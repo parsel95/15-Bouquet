@@ -16,6 +16,10 @@ const createHeaderTemplate = () =>
   `;
 
 
+/**
+ * Корневой View шапки приложения.
+ * Предоставляет отдельные контейнеры для логотипа и счётчика отложенных.
+ */
 export default class HeaderView extends AbstractView {
   get template() {
     return createHeaderTemplate();

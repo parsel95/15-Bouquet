@@ -2,6 +2,14 @@ import DeferredCatalogItemView from '../view/deferred/deferred-catalog-item-view
 import {render, remove, replace} from '../framework/render.js';
 import {UserAction, UpdateType} from '../const.js';
 
+/**
+ * Управляет карточкой букета на странице отложенных.
+ *
+ * Изменения количества передаёт родительскому Presenter-у. Для обычного
+ * изменения используется PATCH, чтобы обновить карточку; удаление последнего
+ * экземпляра и удаление всей карточки используют MINOR, чтобы перестроить
+ * список.
+ */
 export default class DeferredCardPresenter {
   #cardComponent = null;
 

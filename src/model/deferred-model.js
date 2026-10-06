@@ -1,12 +1,29 @@
 import Observable from '../framework/observable.js';
-import {UpdateType, ErrorType} from '../const.js';
+import {UpdateType, ErrorType, ErrorThrowMessage} from '../const.js';
 
+/**
+ * Создаёт пустое состояние списка отложенных букетов.
+ */
 const createEmptyDeferred = () => ({
   products: {},
   productCount: 0,
   sum: 0,
 });
 
+/**
+ * Управляет состоянием списка отложенных букетов.
+ *
+ * Отвечает за:
+ * - загрузку состояния с сервера;
+ * - добавление и удаление экземпляров букетов;
+ * - изменение локального состояния;
+ * - оптимистичные обновления;
+ * - откат локального изменения при ошибке запроса;
+ * - синхронизацию с сервером после частичных сбоев.
+ *
+ * Наследуется от Observable и уведомляет подписчиков
+ * об изменениях состояния.
+ */
 export default class DeferredModel extends Observable {
   #deferred = createEmptyDeferred();
   #apiService = null;
@@ -18,6 +35,13 @@ export default class DeferredModel extends Observable {
     this.#apiService = apiService;
   }
 
+  /**
+   * Загружает состояние отложенных с сервера.
+   *
+   * Пустой ответ API преобразуется в единый формат пустого состояния.
+   * При ошибке сохраняется пустое состояние и устанавливается
+   * признак ошибки загрузки.
+   */
   init = async () => {
     this.#isLoadError = false;
 
@@ -36,106 +60,143 @@ export default class DeferredModel extends Observable {
     this._notify(UpdateType.MINOR);
   };
 
+  /**
+   * Получает актуальное состояние отложенных непосредственно с сервера.
+   *
+   * Используется для синхронизации локального состояния после
+   * частичного сбоя нескольких серверных операций.
+   */
   getActualDeferred = async () => this.#normalizeDeferred(await this.#apiService.get());
 
+  /**
+   * Возвращает текущее локальное состояние отложенных.
+   */
   get = () => this.#deferred;
 
+  /**
+   * Возвращает признак завершения первоначальной загрузки.
+   */
   getIsLoaded = () => this.#isLoaded;
 
+  /**
+   * Возвращает признак ошибки первоначальной загрузки отложенных.
+   */
   getIsLoadError = () => this.#isLoadError;
 
+  /**
+   * Проверяет наличие букета в списке отложенных.
+   *
+   * @param {number|string} bouquetId Идентификатор букета.
+   * @returns {boolean} true, если букет находится в отложенных.
+   */
   has = (bouquetId) => Object.hasOwn(this.#deferred.products, bouquetId);
 
+  /**
+   * Приводит ответ API к единому формату состояния отложенных.
+   *
+   * Сервер может вернуть пустой объект вместо объекта с полями
+   * products, productCount и sum.
+   */
   #normalizeDeferred(deferred) {
     return Object.keys(deferred).length === 0
       ? createEmptyDeferred()
       : deferred;
   }
 
+  /**
+   * Увеличивает общее количество экземпляров и сумму отложенных.
+   *
+   * @param {number} price Цена одного экземпляра букета.
+   */
   #increaseTotals(price) {
     this.#deferred.productCount++;
     this.#deferred.sum += price;
   }
 
+  /**
+   * Уменьшает общее количество экземпляров и сумму отложенных.
+   *
+   * @param {number} price Цена одного экземпляра букета.
+   */
   #decreaseTotals(price) {
     this.#deferred.productCount--;
     this.#deferred.sum -= price;
   }
 
-  #increment(updateType, bouquet, action = 'add') {
-    if (action === 'add') {
-      if (this.#deferred.products[bouquet.id]) {
-        this.#deferred.products[bouquet.id]++;
-      } else {
-        this.#deferred.products[bouquet.id] = 1;
-      }
-
-      this.#deferred.productCount++;
-      this.#deferred.sum += bouquet.price;
+  /**
+   * Добавляет один экземпляр букета и обновляет общие итоги.
+   */
+  #increment(updateType, bouquet) {
+    if (this.#deferred.products[bouquet.id]) {
+      this.#deferred.products[bouquet.id]++;
     } else {
+      this.#deferred.products[bouquet.id] = 1;
+    }
+
+    this.#increaseTotals(bouquet.price);
+    this._notify(updateType, bouquet);
+  }
+
+  /**
+   * Удаляет один экземпляр букета и обновляет общие итоги.
+   */
+  #decrement(updateType, bouquet) {
+    if (this.#deferred.products[bouquet.id] > 1) {
       this.#deferred.products[bouquet.id]--;
-
-      if (this.#deferred.products[bouquet.id] === 0) {
-        delete this.#deferred.products[bouquet.id];
-      }
-
-      this.#decreaseTotals(bouquet.price);
-    }
-
-    this._notify(updateType, bouquet);
-  }
-
-  #decrement(updateType, bouquet, action = 'delete') {
-    if (action === 'delete') {
-      if (this.#deferred.products[bouquet.id] > 1) {
-        this.#deferred.products[bouquet.id]--;
-      } else {
-        delete this.#deferred.products[bouquet.id];
-      }
-
-      this.#deferred.productCount--;
-      this.#deferred.sum -= bouquet.price;
     } else {
-      if (!this.#deferred.products[bouquet.id]) {
-        this.#deferred.products[bouquet.id] = 1;
-      } else {
-        this.#deferred.products[bouquet.id]++;
-      }
-
-      this.#increaseTotals(bouquet.price);
+      delete this.#deferred.products[bouquet.id];
     }
 
+    this.#decreaseTotals(bouquet.price);
     this._notify(updateType, bouquet);
   }
 
+  /**
+   * Оптимистично добавляет букет в отложенные и отправляет
+   * соответствующий запрос на сервер.
+   *
+   * При ошибке запроса локальное изменение откатывается,
+   * после чего ошибка передаётся вызывающему коду.
+   */
   add = async (updateType, bouquet) => {
     this.#increment(updateType, bouquet);
 
     try {
       await this.#apiService.add(bouquet);
     } catch {
-      this.#increment(updateType, bouquet, 'delete');
+      this.#decrement(updateType, bouquet);
 
-      const addDeferredError = new Error('Can\'t add bouquet');
-      addDeferredError.type = ErrorType.ADD_DEFERRED;
-      throw addDeferredError;
+      throw this.#createError(ErrorThrowMessage.ADD_DEFERRED, ErrorType.ADD_DEFERRED);
     }
   };
 
+  /**
+   * Оптимистично удаляет один экземпляр букета из отложенных
+   * и отправляет соответствующий запрос на сервер.
+   *
+   * При ошибке запроса локальное изменение откатывается.
+   */
   delete = async (updateType, bouquet) => {
     this.#decrement(updateType, bouquet);
 
     try {
       await this.#apiService.delete(bouquet.id);
     } catch {
-      this.#decrement(updateType, bouquet, 'add');
+      this.#increment(updateType, bouquet);
 
-      const deleteDeferredError = new Error('Can\'t delete bouquet');
-      deleteDeferredError.type = ErrorType.DELETE_DEFERRED;
-      throw deleteDeferredError;
+      throw this.#createError(ErrorThrowMessage.DELETE_DEFERRED, ErrorType.DELETE_DEFERRED);
     }
   };
 
+  /**
+   * Удаляет все экземпляры всех букетов из отложенных.
+   *
+   * Запросы выполняются через Promise.allSettled(), поскольку
+   * отдельные удаления могут завершиться с разными результатами.
+   *
+   * При частичном сбое локальное состояние не откатывается вручную.
+   * Вместо этого оно повторно загружается с сервера для синхронизации.
+   */
   cleanAll = async (updateType) => {
     const bouquetIds = Object.keys(this.#deferred.products);
 
@@ -159,25 +220,21 @@ export default class DeferredModel extends Observable {
       return;
     }
 
-    try {
-      const actualDeferred = await this.getActualDeferred();
+    await this.#syncDeferred(updateType);
 
-      this.#deferred = actualDeferred;
-      this._notify(updateType);
-    } catch {
-      const syncDeferredError = new Error('Can\'t synchronize deferred');
-      syncDeferredError.type = ErrorType.SYNC_DEFERRED;
-      throw syncDeferredError;
-    }
-
-    const cleanAllDeferredError = new Error('Can\'t delete all bouquets');
-    cleanAllDeferredError.type = ErrorType.CLEAN_ALL_DEFERRED;
-    throw cleanAllDeferredError;
+    throw this.#createError(ErrorThrowMessage.CLEAN_ALL_DEFERRED, ErrorType.CLEAN_ALL_DEFERRED);
   };
 
+  /**
+   * Полностью удаляет один букет из списка отложенных
+   * вместе со всеми его экземплярами.
+   *
+   * При частичном сбое запросов состояние синхронизируется
+   * с сервером через getActualDeferred().
+   */
   deleteCard = async (updateType, bouquet) => {
     const savedCount = this.#deferred.products[bouquet.id];
-    const savedPrice = bouquet.price * this.#deferred.products[bouquet.id];
+    const savedPrice = bouquet.price * savedCount;
     const deleteRequests = [];
 
     this.#deferred.productCount -= savedCount;
@@ -185,7 +242,7 @@ export default class DeferredModel extends Observable {
 
     delete this.#deferred.products[bouquet.id];
 
-    this._notify(updateType);
+    this._notify(updateType, bouquet);
 
     for (let i = 0; i < savedCount; i++) {
       deleteRequests.push(
@@ -202,27 +259,45 @@ export default class DeferredModel extends Observable {
       return;
     }
 
+    await this.#syncDeferred(updateType);
+
+    throw this.#createError(ErrorThrowMessage.CLEAN_CARD_DEFERRED, ErrorType.CLEAN_CARD_DEFERRED);
+  };
+
+  /**
+   * Переключает наличие букета в отложенных.
+   *
+   * Если букет отсутствует, добавляет один экземпляр.
+   * Если сохранён один экземпляр, удаляет его.
+   * Если сохранено несколько экземпляров, полностью удаляет букет
+   * вместе со всеми его экземплярами.
+   */
+  toggleDeferred = (updateType, bouquet) => {
+    if (this.has(bouquet.id)) {
+      if (this.#deferred.products[bouquet.id] > 1) {
+        return this.deleteCard(updateType, bouquet);
+      } else {
+        return this.delete(updateType, bouquet);
+      }
+    }
+
+    return this.add(updateType, bouquet);
+  };
+
+  #syncDeferred = async (updateType) => {
     try {
       const actualDeferred = await this.getActualDeferred();
 
       this.#deferred = actualDeferred;
       this._notify(updateType);
     } catch {
-      const syncDeferredError = new Error('Can\'t synchronize deferred');
-      syncDeferredError.type = ErrorType.SYNC_DEFERRED;
-      throw syncDeferredError;
+      throw this.#createError(ErrorThrowMessage.SYNC_DEFERRED, ErrorType.SYNC_DEFERRED);
     }
-
-    const cleanCardDeferredError = new Error('Can\'t delete this card');
-    cleanCardDeferredError.type = ErrorType.CLEAN_CARD_DEFERRED;
-    throw cleanCardDeferredError;
   };
 
-  toggleDeferred = (updateType, bouquet) => {
-    if (this.has(bouquet.id)) {
-      return this.delete(updateType, bouquet);
-    }
-
-    return this.add(updateType, bouquet);
-  };
+  #createError(message, type) {
+    const error = new Error(message);
+    error.type = type;
+    return error;
+  }
 }

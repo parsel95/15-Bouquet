@@ -39,6 +39,11 @@ const createCardViewTemplate = ({title, description, type, price, previewImage},
   `;
 };
 
+/**
+ * Отображает краткую информацию о букете в каталоге.
+ * Принимает признак отложенного букета для оформления карточки
+ * и передаёт Presenter-у события открытия и переключения статуса.
+ */
 export default class CardView extends AbstractView {
   #bouquet = null;
   #isDeferred = false;

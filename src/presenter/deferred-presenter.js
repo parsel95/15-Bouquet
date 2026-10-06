@@ -15,6 +15,14 @@ import {render, RenderPosition, remove, replace} from '../framework/render.js';
 import {UserAction, UpdateType, ErrorType} from '../const.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
+/**
+ * Управляет страницей отложенных букетов.
+ *
+ * Получает данные из моделей, создаёт Presenter-ы карточек и обновляет
+ * список по событиям DeferredModel. Пользовательские операции передаются
+ * модели, а Presenter показывает ошибки и блокирует интерфейс на время
+ * запросов.
+ */
 export default class DeferredPresenter {
   #deferredComponent = new DeferredView();
   #heroDeferredComponent = new HeroView({isPopup: true});

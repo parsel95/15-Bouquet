@@ -20,6 +20,10 @@ const createLoadErrorDeferredTemplate = () => `
   </div>
 `;
 
+/**
+ * Показывает ошибку загрузки или синхронизации отложенных букетов.
+ * Presenter передаёт тип ошибки и callback повторной попытки.
+ */
 export default class LoadErrorDeferredView extends AbstractView {
   get template() {
     return createLoadErrorDeferredTemplate();

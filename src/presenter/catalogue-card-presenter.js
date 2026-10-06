@@ -2,6 +2,12 @@ import CardView from '../view/card/card-view.js';
 import {render, remove, replace} from '../framework/render.js';
 import {UserAction, UpdateType} from '../const.js';
 
+/**
+ * Управляет одной карточкой каталога.
+ *
+ * Передаёт открытие букета и переключение его статуса в отложенных
+ * родительскому Presenter-у, а при обновлении данных заменяет View карточки.
+ */
 export default class CatalogueCardPresenter {
   #cardComponent = null;
 

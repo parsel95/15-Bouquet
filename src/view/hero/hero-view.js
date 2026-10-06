@@ -11,6 +11,11 @@ const createHeroViewTemplate = ({isPopup}) =>
     </section>
   `;
 
+/**
+ * Отображает основной или компактный вариант hero-секции.
+ * Вариант выбирается параметром isPopup; в компактном варианте
+ * кнопка закрытия передаёт действие Presenter-у.
+ */
 export default class HeroView extends AbstractView {
   #isPopup = false;
 

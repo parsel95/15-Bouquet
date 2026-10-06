@@ -19,6 +19,11 @@ const createFilterColorTemplate = (filters, currentColor, text) => {
   `;
 };
 
+/**
+ * Отображает доступные цветовые фильтры и текущий набор выбранных цветов.
+ * При событии change передаёт выбранный тип цвета Presenter-у;
+ * правила сочетания цветов остаются в FilterModel.
+ */
 export default class FilterColorView extends AbstractView {
   #filters = null;
   #currentColors = null;

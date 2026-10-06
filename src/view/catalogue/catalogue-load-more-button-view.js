@@ -5,6 +5,10 @@ const createLoadMoreButtonViewTemplate = () =>
       больше букетов
   </button>`;
 
+/**
+ * Кнопка запроса следующей порции каталога.
+ * Сам View только передаёт клик; выбор и отрисовку букетов выполняет Presenter.
+ */
 export default class LoadMoreButtonView extends AbstractView {
   get template() {
     return createLoadMoreButtonViewTemplate();

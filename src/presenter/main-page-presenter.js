@@ -8,6 +8,13 @@ import FilterColorPresenter from './filter-color-presenter.js';
 
 import {render, remove} from '../framework/render.js';
 
+/**
+ * Собирает главную страницу из статических секций, фильтров и каталога.
+ *
+ * Переданные данные восстановления относятся к каталогу; Presenter
+ * передаёт их CataloguePresenter и уничтожает созданные секции и дочерние
+ * Presenter-ы при завершении жизненного цикла страницы.
+ */
 export default class MainPagePresenter {
   #heroComponent = new HeroView();
   #missionComponent = new MissionView();

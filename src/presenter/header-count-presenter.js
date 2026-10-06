@@ -2,6 +2,12 @@ import HeaderCountView from '../view/header/header-count-view.js';
 
 import {render, remove, replace} from '../framework/render.js';
 
+/**
+ * Показывает количество отложенных букетов в шапке.
+ *
+ * Подписывается на DeferredModel и заменяет View при уведомлении модели.
+ * При уничтожении Presenter снимает подписку и удаляет View.
+ */
 export default class HeaderCountPresenter {
   #headerCountComponent = null;
 

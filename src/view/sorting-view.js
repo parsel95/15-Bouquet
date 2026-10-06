@@ -36,6 +36,11 @@ const createSortingTemplate = (activeSortType) =>
     </div>
   `;
 
+/**
+ * Отображает выбранный вариант сортировки по цене.
+ * Делегирует клики по ссылкам и передаёт SortType Presenter-у;
+ * сам View не сортирует каталог.
+ */
 export default class SortingView extends AbstractView {
   #currentSortType = null;
 

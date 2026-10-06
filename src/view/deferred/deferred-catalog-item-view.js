@@ -45,6 +45,11 @@ const createDeferredCatalogItemTemplate = ({title, description, price, previewIm
     </li>
   `;
 
+/**
+ * Отображает букет в списке отложенных и его текущее количество.
+ * Стоимость строки рассчитывается как цена букета, умноженная на количество;
+ * действия пользователя передаются Presenter-у через callbacks.
+ */
 export default class DeferredCatalogItemView extends AbstractView {
   #bouquet = null;
   #count = null;

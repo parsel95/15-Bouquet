@@ -9,6 +9,11 @@ const createCatalogueEmptyListTemplate = () =>
     </div>
   `;
 
+/**
+ * Показывает сообщение вместо списка каталога.
+ * Presenter задаёт текст, чтобы использовать View для пустого результата
+ * или сообщения об ошибке загрузки.
+ */
 export default class CatalogueEmptyListView extends AbstractView {
   get template() {
     return createCatalogueEmptyListTemplate();

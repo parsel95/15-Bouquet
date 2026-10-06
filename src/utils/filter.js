@@ -1,5 +1,9 @@
 import {ReasonType, ColorType} from '../const.js';
 
+/**
+ * Функции фильтрации по поводу. Каждая возвращает новый массив
+ * и не изменяет исходный список.
+ */
 const filterReason = {
   [ReasonType.ALL]: (bouquets) => [...bouquets],
   [ReasonType.BIRTHDAY]: (bouquets) => bouquets.filter((bouquet) => bouquet.type === ReasonType.BIRTHDAY ),
@@ -9,6 +13,10 @@ const filterReason = {
   [ReasonType.DARLING]: (bouquets) => bouquets.filter((bouquet) => bouquet.type === ReasonType.DARLING),
 };
 
+/**
+ * Фильтры по цвету возвращают отдельные списки для выбранных цветов;
+ * CataloguePresenter объединяет результаты для поддержки нескольких цветов.
+ */
 const filterColor = {
   [ColorType.ALL]: (bouquets) => [...bouquets],
   [ColorType.RED]: (bouquets) => bouquets.filter((bouquet) => bouquet.color === ColorType.RED ),

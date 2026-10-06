@@ -1,3 +1,4 @@
+// Типы причин
 const ReasonType = {
   ALL: 'all',
   BIRTHDAY: 'birthday',
@@ -7,6 +8,7 @@ const ReasonType = {
   DARLING: 'darling',
 };
 
+// Текст для отображения причин
 const ReasonTypeText = {
   [ReasonType.ALL]: 'Для всех',
   [ReasonType.BIRTHDAY]: 'Имениннику',
@@ -16,6 +18,7 @@ const ReasonTypeText = {
   [ReasonType.DARLING]: 'Любимой',
 };
 
+// Типы цветов
 const ColorType = {
   ALL: 'all',
   RED: 'red',
@@ -25,6 +28,7 @@ const ColorType = {
   PINK: 'pink',
 };
 
+// Текст для отображения цветов
 const ColorTypeText = {
   [ColorType.ALL]: 'все цвета',
   [ColorType.RED]: 'красный',
@@ -34,6 +38,7 @@ const ColorTypeText = {
   [ColorType.PINK]: 'розовый',
 };
 
+// Типы надписей на букете
 const LabelType = {
   birthday: 'имениннику',
   darling: 'любимой',
@@ -42,23 +47,28 @@ const LabelType = {
   mother: 'маме',
 };
 
+// Конфигурация логотипа
 const LogoConfig = {
   HEADER: { width: 86, height: 84 },
   FOOTER: { width: 60, height: 59 }
 };
 
+// Имя родительского элемента для логотипа в футере
 const logoParentName = 'FOOTER';
 
+// Типы страниц
 const Page = {
   MAIN: 'MAIN',
   DEFERRED: 'DEFERRED'
 };
 
+// Типы сортировки
 const SortType = {
   PRICE_UP: 'price-up',
   PRICE_DOWN: 'price-down',
 };
 
+// Типы действий пользователя
 const UserAction = {
   TOGGLE_DEFERRED: 'TOGGLE_DEFERRED',
   INCREMENT_DEFERRED: 'INCREMENT_DEFERRED',
@@ -67,6 +77,7 @@ const UserAction = {
   CLEAR_DEFERRED: 'CLEAR_DEFERRED',
 };
 
+// Типы обновлений данных
 const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
@@ -76,20 +87,24 @@ const UpdateType = {
   ERROR_LOAD_DEFERRED: 'ERROR_LOAD_DEFERRED',
 };
 
+// Типы HTTP-методов
 const Method = {
   GET: 'GET',
   PUT: 'PUT',
   DELETE: 'DELETE',
 };
 
+// Типы сообщений для каталога
 const CatalogueMessageType = {
   EMPTY: 'EMPTY',
 };
 
+// Сообщения для отображения в каталоге
 const CatalogueMessage = {
   [CatalogueMessageType.EMPTY]: 'К сожалению, таких букетов у нас пока нет',
 };
 
+// Типы ошибок
 const ErrorType = {
   LOAD_BOUQUETS: 'LOAD_BOUQUETS',
   LOAD_DEFERRED: 'LOAD_DEFERRED',
@@ -101,6 +116,7 @@ const ErrorType = {
   SYNC_DEFERRED: 'SYNC_DEFERRED',
 };
 
+// Сообщения об ошибках для отображения пользователю
 const ErrorMessage = {
   [ErrorType.LOAD_BOUQUETS]:
     'К сожалению, нам не удалось загрузить букеты. Попробуйте ещё раз',
@@ -127,6 +143,32 @@ const ErrorMessage = {
     'Не удалось синхронизировать отложенные. Попробуйте ещё раз.',
 };
 
+const ErrorThrowMessage = {
+  [ErrorType.LOAD_BOUQUETS]:
+    'Can\'t load bouquets',
+
+  [ErrorType.LOAD_DEFERRED]:
+    'Can\'t load deferred',
+
+  [ErrorType.ADD_DEFERRED]:
+    'Can\'t add bouquet to deferred',
+
+  [ErrorType.DELETE_DEFERRED]:
+    'Can\'t delete bouquet from deferred',
+
+  [ErrorType.CLEAN_CARD_DEFERRED]:
+    'Can\'t delete all instances of this bouquet',
+
+  [ErrorType.CLEAN_ALL_DEFERRED]:
+    'Can\'t clean all deferred',
+
+  [ErrorType.LOAD_MODAL]:
+    'Can\'t load modal data',
+
+  [ErrorType.SYNC_DEFERRED]:
+    'Can\'t synchronize deferred',
+};
+
 export {
   ReasonType,
   ReasonTypeText,
@@ -144,4 +186,5 @@ export {
   CatalogueMessage,
   ErrorType,
   ErrorMessage,
+  ErrorThrowMessage
 };

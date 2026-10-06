@@ -2,6 +2,11 @@ import FilterColorView from '../view/filter-color/filter-color-view.js';
 import {render, remove, replace} from '../framework/render.js';
 import {ColorType, ColorTypeText, UpdateType} from '../const.js';
 
+/**
+ * Связывает выбор одного или нескольких цветов с FilterModel.
+ * View получает из модели текущий набор цветов и обновляется
+ * при уведомлениях об изменении фильтров.
+ */
 export default class FilterColorPresenter {
   #container = null;
   #filterColorComponent = null;

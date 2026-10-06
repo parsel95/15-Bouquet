@@ -10,6 +10,13 @@ import {render, RenderPosition} from '../framework/render.js';
 import {setToZeroOpacity, setToFullOpacity} from '../utils/animation.js';
 import {logoParentName, Page} from '../const.js';
 
+/**
+ * Управляет общими элементами приложения и жизненным циклом страниц.
+ *
+ * Перед уходом с каталога сохраняет позицию прокрутки, число показанных
+ * букетов и выбранную сортировку. При возврате по запросу передаёт эти
+ * значения новому MainPagePresenter для восстановления состояния каталога.
+ */
 export default class AppPresenter {
   #headerComponent = new HeaderView();
   #footerComponent = new FooterView();
@@ -123,6 +130,16 @@ export default class AppPresenter {
     this.#deferredPresenter.init();
   }
 
+  /**
+   * Переключает страницу с задержкой для анимации смены содержимого.
+   *
+   * Пока переход выполняется, повторные вызовы игнорируются. Состояние
+   * каталога сохраняется до уничтожения его Presenter-а.
+   *
+   * @param {string} targetPage Страница, которую нужно показать.
+   * @param {boolean} [shouldRestore=false] Нужно ли восстановить каталог.
+   * @param {number} [time=400] Задержка перехода в миллисекундах.
+   */
   #switchPage = (targetPage, shouldRestore = false, time = 400) => {
     if (this.#isSwitchingPage) {
       return;

@@ -7,6 +7,10 @@ const createDeferredTemplate = () =>
     </div>
   `;
 
+/**
+ * Корневой View страницы отложенных букетов.
+ * Предоставляет контейнер, в который Presenter собирает секции страницы.
+ */
 export default class DeferredView extends AbstractView {
   get template() {
     return createDeferredTemplate();

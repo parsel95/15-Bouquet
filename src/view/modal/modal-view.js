@@ -47,6 +47,11 @@ const createModalViewTemplate = ({title, description, price, authorPhoto, images
     </div>
  `;
 
+/**
+ * Представляет окно с подробной информацией о букете.
+ * Создаёт слайдер изображений и предоставляет Presenter-у обработчики
+ * закрытия и изменения статуса букета в отложенных.
+ */
 export default class ModalView extends AbstractView {
   #bouquet = null;
   #isDeferred = false;
@@ -62,6 +67,7 @@ export default class ModalView extends AbstractView {
     return createModalViewTemplate(this.#bouquet, this.#isDeferred);
   }
 
+  /** Инициализирует слайдер после добавления модального View в DOM. */
   initSlider() {
     const sliderElement = this.element.querySelector('.image-slider');
 
@@ -95,6 +101,7 @@ export default class ModalView extends AbstractView {
     this._callback.deferredClick();
   };
 
+  /** Освобождает экземпляр Swiper, принадлежащий этому View. */
   destroy() {
     if (this.#slider) {
       this.#slider.destroy();

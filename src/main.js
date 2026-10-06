@@ -1,3 +1,14 @@
+/**
+ * Точка входа приложения.
+ *
+ * Создаёт основные зависимости приложения:
+ * API-сервисы, модели состояния и корневой AppPresenter.
+ *
+ * AppPresenter инициализируется до запуска запросов моделей,
+ * чтобы приложение сначала сформировало необходимую структуру интерфейса,
+ * а затем получило данные с сервера.
+ */
+
 import AppPresenter from './presenter/app-presenter.js';
 import BouquetsModel from './model/bouquets-model.js';
 import DeferredModel from './model/deferred-model.js';

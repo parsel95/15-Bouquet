@@ -17,6 +17,11 @@ export default class DeferredCleanButtonView extends AbstractView {
     return createDeferredCleanButtonTemplate();
   }
 
+  /**
+   * Меняет подпись кнопки на время очистки списка.
+   *
+   * @param {boolean} isCleaning Признак выполняющейся очистки.
+   */
   // eslint-disable-next-line accessor-pairs
   set buttonText(isCleaning) {
     this.#isCleaning = isCleaning;

@@ -1,6 +1,15 @@
 import Observable from '../framework/observable';
 import {UpdateType} from '../const.js';
 
+/**
+ * Хранит и предоставляет данные каталога букетов.
+ *
+ * Отвечает за загрузку каталога через API-сервис, хранение состояния
+ * загрузки и адаптацию полученных данных к формату клиентского приложения.
+ *
+ * Наследуется от Observable и уведомляет подписчиков о начале и завершении
+ * загрузки каталога.
+ */
 export default class BouquetsModel extends Observable {
   #bouquets = [];
   #apiService = null;
@@ -12,6 +21,13 @@ export default class BouquetsModel extends Observable {
     this.#apiService = apiService;
   }
 
+  /**
+   * Загружает каталог букетов с сервера.
+   *
+   * Перед началом загрузки отправляет событие LOADING.
+   * После успешной загрузки адаптирует данные к клиентскому формату.
+   * При ошибке сохраняет пустой каталог и устанавливает признак ошибки.
+   */
   init = async () => {
     this.#isLoaded = false;
     this.#isLoadError = false;
@@ -32,12 +48,24 @@ export default class BouquetsModel extends Observable {
     this._notify(UpdateType.INIT);
   };
 
+  /**
+   * Возвращает текущий каталог букетов.
+   */
   get = () => this.#bouquets;
 
   getIsLoaded = () => this.#isLoaded;
 
+  /**
+   * Возвращает признак ошибки последней загрузки каталога.
+   */
   getIsLoadError = () => this.#isLoadError;
 
+  /**
+   * Запрашивает данные конкретного букета через API-сервис.
+   *
+   * @param {number|string} id Идентификатор букета.
+   * @returns {Promise<Object>} Данные букета.
+   */
   getById = (id) => this.#apiService.getById(id);
 
   #adaptToClient = (bouquet) => ({

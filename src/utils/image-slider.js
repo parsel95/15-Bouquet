@@ -1,5 +1,10 @@
 import '../vendor/swiper.js';
 
+/**
+ * Управляет экземпляром Swiper, привязанным к переданному DOM-элементу.
+ * destroy() освобождает экземпляр и сбрасывает ссылку на него; этот метод
+ * нужно вызывать при завершении жизненного цикла View слайдера.
+ */
 export default class ImageSlider {
   constructor(sliderElement) {
     this.sliderElement = sliderElement;

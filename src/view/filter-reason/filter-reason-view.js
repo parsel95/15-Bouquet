@@ -19,6 +19,10 @@ const createFilterReasonTemplate = (filters, currentReason, text) => {
   `;
 };
 
+/**
+ * Отображает фильтры по поводу и текущее выбранное значение.
+ * При изменении контрола передаёт тип фильтра Presenter-у.
+ */
 export default class FilterReasonView extends AbstractView {
   #filters = null;
   #currentReason = null;
