@@ -26,15 +26,15 @@ const createDeferredSumTemplate = ({productCount, sum}) =>
  * и общую сумму, переданные моделью.
  */
 export default class DeferredSumView extends AbstractView {
-  #deferredBouquets = null;
+  #deferred;
 
-  constructor(deferredBouquets) {
+  constructor(deferred) {
     super();
-    this.#deferredBouquets = deferredBouquets;
+    this.#deferred = deferred;
   }
 
   get template() {
-    return createDeferredSumTemplate(this.#deferredBouquets);
+    return createDeferredSumTemplate(this.#deferred);
   }
 }
 

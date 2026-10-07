@@ -14,13 +14,23 @@ import ModalPresenter from './modal-presenter.js';
 
 import {render, RenderPosition, remove, replace} from '../framework/render.js';
 import {setToZeroOpacity, setToFullOpacity} from '../utils/animation.js';
-import {sortBouquetsByPriceUp, sortBouquetsByPriceDown} from '../utils/common.js';
+import {sortByPriceUp, sortByPriceDown} from '../utils/common.js';
 import ScrollLock from '../utils/scroll-lock.js';
-import {SortType, UserAction, UpdateType, CatalogueMessage, CatalogueMessageType, ErrorType, ErrorMessage} from '../const.js';
+import {
+  SortType,
+  UserAction,
+  UpdateType,
+  CatalogueMessage,
+  CatalogueMessageType,
+  ErrorType,
+  ErrorMessage
+} from '../const.js';
 import {filterReason, filterColor} from '../utils/filter.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 const BOUQUET_COUNT_PER_STEP = 6;
+const MODAL_OPEN_DELAY = 10;
+const MODAL_CLOSE_DELAY = 500;
 
 /**
  * Управляет отображением каталога и его взаимодействием с моделями.
@@ -57,7 +67,6 @@ export default class CataloguePresenter {
 
   #selectedBouquet = null;
   #renderedBouquetsCount = BOUQUET_COUNT_PER_STEP;
-  #savedRenderedBouquetsCount = null;
   #currentSortType = SortType.PRICE_UP;
   #isBouquetsLoading = true;
   #isDeferredLoading = true;
@@ -67,7 +76,13 @@ export default class CataloguePresenter {
   #scrollLock = new ScrollLock();
   #uiBlocker = new UiBlocker({lowerLimit: 350, upperLimit: 1000});
 
-  constructor(bodyContainer, mainContainer, bouquetsModel, deferredModel, filterModel) {
+  constructor(
+    bodyContainer,
+    mainContainer,
+    bouquetsModel,
+    deferredModel,
+    filterModel
+  ) {
     this.#bodyContainer = bodyContainer;
     this.#mainContainer = mainContainer;
     this.#bouquetsModel = bouquetsModel;
@@ -91,9 +106,9 @@ export default class CataloguePresenter {
 
     switch (this.#currentSortType) {
       case SortType.PRICE_UP:
-        return [...filteredByColorBouquets].sort(sortBouquetsByPriceUp);
+        return [...filteredByColorBouquets].sort(sortByPriceUp);
       case SortType.PRICE_DOWN:
-        return [...filteredByColorBouquets].sort(sortBouquetsByPriceDown);
+        return [...filteredByColorBouquets].sort(sortByPriceDown);
     }
 
     return filteredByColorBouquets;
@@ -116,20 +131,13 @@ export default class CataloguePresenter {
   }
 
   init(savedCount) {
-    if (savedCount) {
-      this.#savedRenderedBouquetsCount = savedCount;
-      this.#renderedBouquetsCount = savedCount;
-    } else {
-      this.#savedRenderedBouquetsCount = null;
-      this.#renderedBouquetsCount = BOUQUET_COUNT_PER_STEP;
-    }
+    this.#renderedBouquetsCount = savedCount ?? BOUQUET_COUNT_PER_STEP;
 
     this.#isBouquetsLoading = !this.#bouquetsModel.getIsLoaded();
     this.#isDeferredLoading = !this.#deferredModel.getIsLoaded();
     this.#isBouquetsLoadError = this.#bouquetsModel.getIsLoadError();
 
     this.#renderCatalogue();
-    this.#savedRenderedBouquetsCount = null;
   }
 
   #handleViewAction = async (actionType, updateType, updateBouquet) => {
@@ -137,7 +145,7 @@ export default class CataloguePresenter {
       this.#uiBlocker.block();
 
       try {
-        await this.#handleUpdateBouquet(updateType, updateBouquet);
+        await this.#deferredModel.toggleDeferred(updateType, updateBouquet);
       } catch (error) {
         this.#renderCatalogueErrorModal(error.type);
       } finally {
@@ -145,10 +153,6 @@ export default class CataloguePresenter {
       }
     }
   };
-
-  #handleUpdateBouquet(updateType, updatedBouquet) {
-    return this.#deferredModel.toggleDeferred(updateType, updatedBouquet);
-  }
 
   #renderCatalogueErrorModal(type) {
     this.#catalogueErrorModalComponent.setText(type);
@@ -184,9 +188,7 @@ export default class CataloguePresenter {
     this.#isBouquetsLoading = !this.#bouquetsModel.getIsLoaded();
     this.#isBouquetsLoadError = this.#bouquetsModel.getIsLoadError();
 
-    if (this.#cardPresenters.size > 0) {
-      this.#clearCatalogueCards();
-    }
+    this.#clearCatalogueCards();
 
     this.#renderCatalogue();
   }
@@ -219,25 +221,23 @@ export default class CataloguePresenter {
     this.#updateModal(data);
   }
 
-  #updateCard = (updatedBouquet) => {
+  #updateCard(updatedBouquet) {
     if (this.#cardPresenters.has(updatedBouquet.id)) {
       this.#cardPresenters.get(updatedBouquet.id).init(updatedBouquet);
     }
-  };
+  }
 
-  #updateModal = (updatedBouquet) => {
+  #updateModal(updatedBouquet) {
     if (this.#modalPresenter && this.#selectedBouquet.id === updatedBouquet.id) {
       this.#selectedBouquet = updatedBouquet;
       this.#modalPresenter.updateDeferredStatus();
     }
-  };
+  }
 
   #handleDeferredInit() {
     this.#isDeferredLoading = !this.#deferredModel.getIsLoaded();
 
-    if (this.#cardPresenters.size > 0) {
-      this.#clearCatalogueCards();
-    }
+    this.#clearCatalogueCards();
 
     this.#renderCatalogue();
   }
@@ -290,13 +290,16 @@ export default class CataloguePresenter {
       return;
     }
 
-    const newRenderedBouquetsCount = Math.min(bouquetsCount, this.#renderedBouquetsCount + BOUQUET_COUNT_PER_STEP);
+    const newRenderedBouquetsCount = Math.min(
+      bouquetsCount,
+      this.#renderedBouquetsCount + BOUQUET_COUNT_PER_STEP
+    );
 
     const bouquets = this.bouquets.slice(this.#renderedBouquetsCount, newRenderedBouquetsCount);
 
     this.#renderCards(bouquets, this.#catalogueListComponent.element);
 
-    this.#renderedBouquetsCount += BOUQUET_COUNT_PER_STEP;
+    this.#renderedBouquetsCount = newRenderedBouquetsCount;
 
     if (this.#renderedBouquetsCount >= bouquetsCount) {
       remove(this.#loadMoreButtonComponent);
@@ -310,11 +313,13 @@ export default class CataloguePresenter {
 
     this.#currentSortType = sortType;
 
-    // После смены порядка снова показываем первую порцию каталога.
     const bouquets = this.bouquets.slice(0, BOUQUET_COUNT_PER_STEP);
     this.#clearCatalogueList();
     this.#renderSorting(this.#catalogueComponent.getSortingContainer());
-    this.#renderCatalogueList(bouquets, this.#catalogueComponent.getButtonsContainer());
+    this.#renderCatalogueList(
+      bouquets,
+      this.#catalogueComponent.getButtonsContainer()
+    );
   };
 
   #renderSorting(container) {
@@ -351,8 +356,11 @@ export default class CataloguePresenter {
   }
 
   #renderCatalogueList(bouquets, container) {
-
-    render(this.#catalogueListComponent, container, RenderPosition.BEFOREBEGIN);
+    render(
+      this.#catalogueListComponent,
+      container,
+      RenderPosition.BEFOREBEGIN
+    );
     this.#renderCards(bouquets, this.#catalogueListComponent.element);
 
     if (this.#renderedBouquetsCount < this.bouquets.length) {
@@ -379,7 +387,7 @@ export default class CataloguePresenter {
     this.#cardPresenters.set(bouquet.id, cardPresenter);
   }
 
-  #handleOpenModal = async (bouquet, time = 10) => {
+  #handleOpenModal = async (bouquet) => {
     if (this.#selectedBouquet && this.#selectedBouquet.id === bouquet.id) {
       return;
     }
@@ -407,10 +415,10 @@ export default class CataloguePresenter {
 
     setTimeout(() => {
       setToFullOpacity(this.#modalPresenter.modalElement());
-    }, time);
+    }, MODAL_OPEN_DELAY);
   };
 
-  #handleCloseModal = (time = 500) => {
+  #handleCloseModal = () => {
     setToZeroOpacity(this.#modalPresenter.modalElement(), 0.5);
 
     setTimeout(() => {
@@ -422,7 +430,7 @@ export default class CataloguePresenter {
       document.removeEventListener('keydown', this.#onEscKeyDown);
 
       setToFullOpacity(this.#catalogueComponent.element);
-    }, time);
+    }, MODAL_CLOSE_DELAY);
   };
 
   #renderModal() {
@@ -440,16 +448,20 @@ export default class CataloguePresenter {
 
   #renderEmptyCatalogue(container) {
     if (this.#isBouquetsLoadError) {
-      this.#catalogueEmptyListComponent.setText(ErrorMessage[ErrorType.LOAD_BOUQUETS]);
+      this.#catalogueEmptyListComponent.setText(
+        ErrorMessage[ErrorType.LOAD_BOUQUETS]
+      );
 
       this.#reloadButtonComponent.setClickHandler(() => {
         this.#bouquetsModel.init();
         this.#reloadButtonComponent.removeClickHandler();
       });
 
-      render (this.#reloadButtonComponent, container);
+      render(this.#reloadButtonComponent, container);
     } else {
-      this.#catalogueEmptyListComponent.setText(CatalogueMessage[CatalogueMessageType.EMPTY]);
+      this.#catalogueEmptyListComponent.setText(
+        CatalogueMessage[CatalogueMessageType.EMPTY]
+      );
 
       this.#loadMoreButtonComponent.element.disabled = true;
       this.#scrollToTopButtonComponent.element.disabled = true;
@@ -466,7 +478,7 @@ export default class CataloguePresenter {
   }
 
   #renderCatalogue(shouldRenderSorting = false) {
-    const renderCount = this.#savedRenderedBouquetsCount ?? BOUQUET_COUNT_PER_STEP;
+    const renderCount = this.#renderedBouquetsCount;
     const bouquets = this.bouquets.slice(0, renderCount);
     const buttonsContainer = this.#catalogueComponent.getButtonsContainer();
 
@@ -482,7 +494,7 @@ export default class CataloguePresenter {
       this.#renderSorting(this.#catalogueComponent.getSortingContainer());
     }
 
-    if (!this.#isBouquetsLoading && bouquets.length === 0) {
+    if (bouquets.length === 0) {
       this.#renderEmptyCatalogue(buttonsContainer);
       return;
     }

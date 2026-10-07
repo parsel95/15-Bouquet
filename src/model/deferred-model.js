@@ -1,4 +1,5 @@
 import Observable from '../framework/observable.js';
+
 import {UpdateType, ErrorType, ErrorThrowMessage} from '../const.js';
 
 /**
@@ -166,7 +167,10 @@ export default class DeferredModel extends Observable {
     } catch {
       this.#decrement(updateType, bouquet);
 
-      throw this.#createError(ErrorThrowMessage.ADD_DEFERRED, ErrorType.ADD_DEFERRED);
+      throw this.#createError(
+        ErrorThrowMessage.ADD_DEFERRED,
+        ErrorType.ADD_DEFERRED
+      );
     }
   };
 
@@ -184,7 +188,10 @@ export default class DeferredModel extends Observable {
     } catch {
       this.#increment(updateType, bouquet);
 
-      throw this.#createError(ErrorThrowMessage.DELETE_DEFERRED, ErrorType.DELETE_DEFERRED);
+      throw this.#createError(
+        ErrorThrowMessage.DELETE_DEFERRED,
+        ErrorType.DELETE_DEFERRED
+      );
     }
   };
 
@@ -222,7 +229,10 @@ export default class DeferredModel extends Observable {
 
     await this.#syncDeferred(updateType);
 
-    throw this.#createError(ErrorThrowMessage.CLEAN_ALL_DEFERRED, ErrorType.CLEAN_ALL_DEFERRED);
+    throw this.#createError(
+      ErrorThrowMessage.CLEAN_ALL_DEFERRED,
+      ErrorType.CLEAN_ALL_DEFERRED
+    );
   };
 
   /**
@@ -261,7 +271,10 @@ export default class DeferredModel extends Observable {
 
     await this.#syncDeferred(updateType);
 
-    throw this.#createError(ErrorThrowMessage.CLEAN_CARD_DEFERRED, ErrorType.CLEAN_CARD_DEFERRED);
+    throw this.#createError(
+      ErrorThrowMessage.CLEAN_CARD_DEFERRED,
+      ErrorType.CLEAN_CARD_DEFERRED
+    );
   };
 
   /**
@@ -291,7 +304,10 @@ export default class DeferredModel extends Observable {
       this.#deferred = actualDeferred;
       this._notify(updateType);
     } catch {
-      throw this.#createError(ErrorThrowMessage.SYNC_DEFERRED, ErrorType.SYNC_DEFERRED);
+      throw this.#createError(
+        ErrorThrowMessage.SYNC_DEFERRED,
+        ErrorType.SYNC_DEFERRED
+      );
     }
   };
 

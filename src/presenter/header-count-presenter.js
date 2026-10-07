@@ -29,7 +29,11 @@ export default class HeaderCountPresenter {
   }
 
   init() {
-    this.#renderHeaderCount();
+    if (!this.#headerCountComponent) {
+      this.#headerCountComponent = new HeaderCountView(this.deferred);
+      render(this.#headerCountComponent, this.#container);
+      this.#headerCountComponent.setClickHandler(this.#handleOpenDeferred);
+    }
   }
 
   #handleModelEvent = () => {
@@ -41,14 +45,6 @@ export default class HeaderCountPresenter {
     replace(this.#headerCountComponent, prevComponent);
     remove(prevComponent);
   };
-
-  #renderHeaderCount() {
-    if (!this.#headerCountComponent) {
-      this.#headerCountComponent = new HeaderCountView(this.deferred);
-      render(this.#headerCountComponent, this.#container);
-      this.#headerCountComponent.setClickHandler(this.#handleOpenDeferred);
-    }
-  }
 
   destroy() {
     this.#deferredModel.removeObserver(this.#handleModelEvent);

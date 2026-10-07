@@ -1,10 +1,19 @@
 import AbstractView from '../../framework/view/abstract-view.js';
+
 import {createModalSliderTemplate} from './modal-slider-template.js';
 import ImageSlider from '../../utils/image-slider.js';
 
 const createModalViewTemplate = ({title, description, price, authorPhoto, images}, isDeferred) =>
   `
-    <div class="modal modal--product product-card-active is-active" data-modal="product-card" style= "opacity: 0">
+    <div
+      class="
+        modal modal--product
+        product-card-active
+        is-active
+      "
+      data-modal="product-card"
+      style= "opacity: 0"
+    >
       <div class="modal__wrapper">
         <div class="modal__overlay" data-close-modal=""></div>
 
@@ -20,7 +29,15 @@ const createModalViewTemplate = ({title, description, price, authorPhoto, images
               </svg>
             </button>
 
-            <svg class="modal-product__btn-close modal-product__loader" width="56" height="56" aria-hidden="true">
+            <svg
+              class="
+                modal-product__btn-close
+                modal-product__loader"
+                width="56"
+                height="56"
+                aria-hidden="true
+              "
+            >
               <use xlink:href="#icon-loader"></use>
             </svg>
 
@@ -37,7 +54,16 @@ const createModalViewTemplate = ({title, description, price, authorPhoto, images
 
               <p class="text text--size-40">${description}</p>
 
-              <button class="btn btn--outlined btn--full-width product-description__button" type="button" data-focus="">
+              <button
+                class="
+                  btn
+                  btn--outlined
+                  btn--full-width
+                  product-description__button
+                "
+                type="button"
+                data-focus=""
+              >
                 ${isDeferred ? 'отложено' : 'отложить'}
               </button>
             </div>
@@ -53,7 +79,7 @@ const createModalViewTemplate = ({title, description, price, authorPhoto, images
  * закрытия и изменения статуса букета в отложенных.
  */
 export default class ModalView extends AbstractView {
-  #bouquet = null;
+  #bouquet;
   #isDeferred = false;
   #slider = null;
 
@@ -77,18 +103,23 @@ export default class ModalView extends AbstractView {
 
   setCloseClickHandler = (callback) => {
     this._callback.closeClick = callback;
-    this.element.querySelector('.modal-product__btn-close').addEventListener('click', this.#closeClickHandler);
+    this.element
+      .querySelector('.modal-product__btn-close')
+      .addEventListener('click', this.#closeClickHandler);
   };
 
   setDeferredClickHandler = (callback) => {
     this._callback.deferredClick = callback;
-    this.element.querySelector('.product-description__button').addEventListener('click', this.#deferredClickHandler);
+    this.element
+      .querySelector('.product-description__button')
+      .addEventListener('click', this.#deferredClickHandler);
   };
 
   updateDeferredStatus(isDeferred) {
     this.#isDeferred = isDeferred;
+
     const button = this.element.querySelector('.product-description__button');
-    button.textContent = this.#isDeferred ? 'отложено' : 'отложить';
+    button.textContent = isDeferred ? 'отложено' : 'отложить';
   }
 
   #closeClickHandler = (evt) => {
@@ -103,9 +134,7 @@ export default class ModalView extends AbstractView {
 
   /** Освобождает экземпляр Swiper, принадлежащий этому View. */
   destroy() {
-    if (this.#slider) {
-      this.#slider.destroy();
-      this.#slider = null;
-    }
+    this.#slider?.destroy();
+    this.#slider = null;
   }
 }

@@ -1,4 +1,5 @@
 import CardView from '../view/card/card-view.js';
+
 import {render, remove, replace} from '../framework/render.js';
 import {UserAction, UpdateType} from '../const.js';
 
@@ -30,9 +31,9 @@ export default class CatalogueCardPresenter {
     this.#bouquet = bouquet;
 
     const prevCardComponent = this.#cardComponent;
-
     const isDeferred = this.#deferredModel.has(bouquet.id);
-    this.#cardComponent = new CardView(this.#bouquet, isDeferred);
+
+    this.#cardComponent = new CardView(bouquet, isDeferred);
 
     this.#cardComponent.setOpenClickHandler(() => {
       this.#clickCardHandler(this.#bouquet);

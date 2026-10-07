@@ -4,15 +4,14 @@ const createCatalogueEmptyListTemplate = () =>
   `
     <div class="message catalogue__no-items">
       <p class="text text--align-center message__text">
-          К сожалению, таких букетов у нас пока нет.
+        К сожалению, таких букетов у нас пока нет.
       </p>
     </div>
   `;
 
 /**
- * Показывает сообщение вместо списка каталога.
- * Presenter задаёт текст, чтобы использовать View для пустого результата
- * или сообщения об ошибке загрузки.
+ * Показывает сообщение в каталоге.
+ * Presenter задаёт текст в зависимости от состояния каталога.
  */
 export default class CatalogueEmptyListView extends AbstractView {
   get template() {

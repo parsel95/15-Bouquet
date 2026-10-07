@@ -1,4 +1,5 @@
 import FilterColorView from '../view/filter-color/filter-color-view.js';
+
 import {render, remove, replace} from '../framework/render.js';
 import {ColorType, ColorTypeText, UpdateType} from '../const.js';
 
@@ -11,8 +12,6 @@ export default class FilterColorPresenter {
   #container = null;
   #filterColorComponent = null;
 
-  #currentColors = null;
-
   #filterModel = null;
 
   constructor(container, filterModel) {
@@ -22,20 +21,21 @@ export default class FilterColorPresenter {
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
-  get filters() {
-    return Object.values(ColorType);
-  }
-
   init() {
-    this.#currentColors = this.#filterModel.colorFilters;
-
-    const filters = this.filters;
+    const currentColors = this.#filterModel.colorFilters;
+    const filters = Object.values(ColorType);
     const text = ColorTypeText;
 
     const prevFilterColorComponent = this.#filterColorComponent;
 
-    this.#filterColorComponent = new FilterColorView(filters, this.#currentColors, text);
-    this.#filterColorComponent.setFilterTypeChangeHandler(this.#filterTypeChangeHandler);
+    this.#filterColorComponent = new FilterColorView(
+      filters,
+      currentColors,
+      text
+    );
+    this.#filterColorComponent.setFilterTypeChangeHandler(
+      this.#filterTypeChangeHandler
+    );
 
     if (prevFilterColorComponent === null) {
       render(this.#filterColorComponent, this.#container);

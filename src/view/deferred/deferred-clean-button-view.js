@@ -23,12 +23,12 @@ export default class DeferredCleanButtonView extends AbstractView {
    * @param {boolean} isCleaning Признак выполняющейся очистки.
    */
   // eslint-disable-next-line accessor-pairs
-  set buttonText(isCleaning) {
-    this.#isCleaning = isCleaning;
-    this.#changeButtonText();
+  set isCleaning(value) {
+    this.#isCleaning = value;
+    this.#updateButtonText();
   }
 
-  #changeButtonText() {
+  #updateButtonText() {
     this.element.querySelector('.popup-deferred__btn-clean-text').textContent =
       this.#isCleaning ? 'очищаем...' : 'очистить';
   }

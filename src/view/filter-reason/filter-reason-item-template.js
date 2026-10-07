@@ -25,7 +25,6 @@ export const createFilterReasonItemTemplate = (currentType, type, text, index) =
         class="filter-field-text__label"
         for="filter-reason-field-id-${index}"
       >
-
         <span class="filter-field-text__text">${text}</span>
       </label>
     </div>

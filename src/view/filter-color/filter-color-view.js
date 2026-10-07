@@ -1,9 +1,13 @@
 import AbstractView from '../../framework/view/abstract-view.js';
+
 import {createFilterColorItemTemplate} from './filter-color-item-template.js';
 
-const createFilterColorTemplate = (filters, currentColor, text) => {
-  const colorItems = filters.map((type, index) =>
-    createFilterColorItemTemplate(currentColor, type, text[type], index)).join('');
+const createFilterColorTemplate = (filters, currentColors, text) => {
+  const colorItems = filters
+    .map((type, index) =>
+      createFilterColorItemTemplate(currentColors, type, text[type], index)
+    )
+    .join('');
   return `
     <section class="filter-color">
       <div class="container">
@@ -25,9 +29,9 @@ const createFilterColorTemplate = (filters, currentColor, text) => {
  * правила сочетания цветов остаются в FilterModel.
  */
 export default class FilterColorView extends AbstractView {
-  #filters = null;
-  #currentColors = null;
-  #text = null;
+  #filters;
+  #currentColors;
+  #text;
 
   constructor(filters, currentColors, text) {
     super();
@@ -40,13 +44,12 @@ export default class FilterColorView extends AbstractView {
     return createFilterColorTemplate(this.#filters, this.#currentColors, this.#text);
   }
 
-  setFilterTypeChangeHandler(callback) {
+  setFilterTypeChangeHandler = (callback) => {
     this._callback.filterTypeChange = callback;
     this.element.addEventListener('change', this.#filterTypeChangeHandler);
-  }
+  };
 
   #filterTypeChangeHandler = (evt) => {
-    evt.preventDefault();
     this._callback.filterTypeChange(evt.target.dataset.filterColor);
   };
 }

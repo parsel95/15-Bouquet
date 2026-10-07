@@ -48,8 +48,15 @@ export default class DeferredPresenter {
 
   #cleanAllUiBlocker = new UiBlocker({lowerLimit: 500, upperLimit: 1000});
 
-  constructor(container, bodyContainer, bouquetsModel, deferredModel, handleCloseDeferred, handleBackToMain) {
-    this.#mainContainer = container;
+  constructor(
+    mainContainer,
+    bodyContainer,
+    bouquetsModel,
+    deferredModel,
+    handleCloseDeferred,
+    handleBackToMain
+  ) {
+    this.#mainContainer = mainContainer;
     this.#bodyContainer = bodyContainer;
     this.#bouquetsModel = bouquetsModel;
     this.#deferredModel = deferredModel;
@@ -76,7 +83,11 @@ export default class DeferredPresenter {
   }
 
   #renderHeroBlock() {
-    render(this.#heroDeferredComponent, this.#deferredComponent.element, RenderPosition.AFTERBEGIN);
+    render(
+      this.#heroDeferredComponent,
+      this.#deferredComponent.element,
+      RenderPosition.AFTERBEGIN
+    );
     this.#heroDeferredComponent.setCloseClickHandler(this.#handleBackToMain);
   }
 
@@ -108,7 +119,10 @@ export default class DeferredPresenter {
   }
 
   #renderDeferredEmptyList() {
-    render(this.#deferredEmptyListComponent, this.#deferredCatalogComponent.element);
+    render(
+      this.#deferredEmptyListComponent,
+      this.#deferredCatalogComponent.element
+    );
     this.#deferredCleanButtonComponent.element.disabled = true;
   }
 
@@ -168,17 +182,17 @@ export default class DeferredPresenter {
     try {
       switch (actionType) {
         case UserAction.INCREMENT_DEFERRED:
-          await this.#handleIncrementBouquet(updateType, updateBouquet);
+          await this.#deferredModel.add(updateType, updateBouquet);
           break;
         case UserAction.REMOVE_DEFERRED_ITEM:
-          await this.#handleDeleteCardBouquet(updateType, updateBouquet);
+          await this.#deferredModel.deleteCard(updateType, updateBouquet);
           break;
         case UserAction.DECREMENT_DEFERRED:
-          await this.#handleDeleteBouquet(updateType, updateBouquet);
+          await this.#deferredModel.delete(updateType, updateBouquet);
           break;
         case UserAction.CLEAR_DEFERRED:
-          this.#deferredCleanButtonComponent.buttonText = true;
-          await this.#handleCleanAllBouquets(updateType);
+          this.#deferredCleanButtonComponent.isCleaning = true;
+          await this.#deferredModel.cleanAll(updateType);
           break;
         default:
           break;
@@ -191,17 +205,9 @@ export default class DeferredPresenter {
       }
     } finally {
       uiBlocker.unblock();
-      this.#deferredCleanButtonComponent.buttonText = false;
+      this.#deferredCleanButtonComponent.isCleaning = false;
     }
   };
-
-  #handleIncrementBouquet = (updateType, updateBouquet) => this.#deferredModel.add(updateType, updateBouquet);
-
-  #handleDeleteBouquet = async (updateType, updateBouquet) => this.#deferredModel.delete(updateType, updateBouquet);
-
-  #handleDeleteCardBouquet = (updateType, updateBouquet) => this.#deferredModel.deleteCard(updateType, updateBouquet);
-
-  #handleCleanAllBouquets = async (updateType) => this.#deferredModel.cleanAll(updateType);
 
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
@@ -230,14 +236,17 @@ export default class DeferredPresenter {
     this.#renderDeferredItems();
     this.#updateSumComponent();
 
-    if (this.#deferredEmptyListComponent && Object.keys(this.deferred.products).length !== 0) {
+    if (Object.keys(this.deferred.products).length !== 0) {
       remove(this.#deferredEmptyListComponent);
     }
   };
 
   #renderDeferredSum() {
     this.#deferredSumComponent = new DeferredSumView(this.deferred);
-    render(this.#deferredSumComponent, this.#deferredComponent.getDeferredContainer());
+    render(
+      this.#deferredSumComponent,
+      this.#deferredComponent.getDeferredContainer()
+    );
   }
 
   #updateSumComponent = () => {
@@ -250,15 +259,30 @@ export default class DeferredPresenter {
   };
 
   #renderDeferredContent() {
-    render(this.#deferredBackButtonComponent, this.#deferredComponent.getDeferredContainer());
+    render(
+      this.#deferredBackButtonComponent,
+      this.#deferredComponent.getDeferredContainer()
+    );
     this.#deferredBackButtonComponent.setClickHandler(this.#handleCloseDeferred);
-    render(this.#deferredCatalogComponent, this.#deferredComponent.getDeferredContainer());
+
+    render(
+      this.#deferredCatalogComponent,
+      this.#deferredComponent.getDeferredContainer()
+    );
     this.#renderDeferredItems();
-    render(this.#deferredBtnContainerComponent, this.#deferredComponent.getDeferredContainer());
-    render(this.#deferredCleanButtonComponent, this.#deferredBtnContainerComponent.element);
+
+    render(
+      this.#deferredBtnContainerComponent,
+      this.#deferredComponent.getDeferredContainer()
+    );
+    render(
+      this.#deferredCleanButtonComponent,
+      this.#deferredBtnContainerComponent.element
+    );
     this.#deferredCleanButtonComponent.setClickHandler(() => {
       this.#handleViewAction(UserAction.CLEAR_DEFERRED, UpdateType.MINOR);
     });
+
     this.#renderDeferredSum();
   }
 

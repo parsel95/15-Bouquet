@@ -17,7 +17,17 @@ export const createFilterColorItemTemplate = (currentColors, type, text, index) 
       <label class="filter-field-img__label" for="filter-colors-field-id-${index}">
         <span class="filter-field-img__img">
           <picture>
-            <source type="image/webp" srcset="img/content/filter-${type}.webp, img/content/filter-${type}@2x.webp 2x"><img src="img/content/filter-${type}.png" srcset="img/content/filter-${type}@2x.png 2x" width="130" height="130" alt="${text}">
+            <source
+              type="image/webp"
+              srcset="img/content/filter-${type}.webp, img/content/filter-${type}@2x.webp 2x"
+            >
+            <img
+              src="img/content/filter-${type}.png"
+              srcset="img/content/filter-${type}@2x.png 2x"
+              width="130"
+              height="130"
+              alt="${text}"
+              >
           </picture>
         </span>
 

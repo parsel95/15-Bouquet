@@ -15,9 +15,8 @@ const createLogoViewTemplate = (config) =>
     </a>
   `;
 
-
 export default class LogoView extends AbstractView {
-  #config = null;
+  #config;
 
   constructor(type = 'HEADER') {
     super();

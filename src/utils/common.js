@@ -20,8 +20,8 @@ const updateItem = (items, update) => {
   ];
 };
 
-const sortBouquetsByPriceUp = (bouquetA, bouquetB) => bouquetA.price - bouquetB.price;
+const sortByPriceUp = (bouquetA, bouquetB) => bouquetA.price - bouquetB.price;
 
-const sortBouquetsByPriceDown = (bouquetA, bouquetB) => bouquetB.price - bouquetA.price;
+const sortByPriceDown = (bouquetA, bouquetB) => bouquetB.price - bouquetA.price;
 
-export {updateItem, sortBouquetsByPriceUp, sortBouquetsByPriceDown};
+export {updateItem, sortByPriceUp, sortByPriceDown};

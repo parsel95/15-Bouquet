@@ -1,24 +1,26 @@
 import AbstractView from '../../framework/view/abstract-view.js';
+
 import {ErrorMessage} from '../../const.js';
 
-const createErrorModalTemplate = () => `
-  <div class="error-modal" role="alertdialog" aria-modal="true">
-    <div class="error-modal__content">
-      <p class="error-modal__title">Упс, что-то пошло не так</p>
+const createErrorModalTemplate = () =>
+  `
+    <div class="error-modal" role="alertdialog" aria-modal="true">
+      <div class="error-modal__content">
+        <p class="error-modal__title">Упс, что-то пошло не так</p>
 
-      <p class="error-modal__text">
-        Не удалось изменить отложенные. Попробуйте ещё раз.
-      </p>
+        <p class="error-modal__text">
+          Не удалось изменить отложенные. Попробуйте ещё раз.
+        </p>
 
-      <button
-        class="btn error-modal__button"
-        type="button"
-      >
-        хорошо
-      </button>
+        <button
+          class="btn error-modal__button"
+          type="button"
+        >
+          хорошо
+        </button>
+      </div>
     </div>
-  </div>
-`;
+  `;
 
 /**
  * Отображает сообщение об ошибке операции.
@@ -31,16 +33,22 @@ export default class ErrorModalView extends AbstractView {
   }
 
   setText = (type) => {
-    this.element.querySelector('.error-modal__text').textContent = ErrorMessage[type];
+    this.element
+      .querySelector('.error-modal__text')
+      .textContent = ErrorMessage[type];
   };
 
   setClickHandler = (callback) => {
     this._callback.click = callback;
-    this.element.querySelector('.error-modal__button').addEventListener('click', this.#clickHandler);
+    this.element
+      .querySelector('.error-modal__button')
+      .addEventListener('click', this.#clickHandler);
   };
 
   removeClickHandler = () => {
-    this.element.querySelector('.error-modal__button').removeEventListener('click', this.#clickHandler);
+    this.element
+      .querySelector('.error-modal__button')
+      .removeEventListener('click', this.#clickHandler);
   };
 
   #clickHandler = (evt) => {

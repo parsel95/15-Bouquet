@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {SortType} from '../const.js';
 
+import {SortType} from '../const.js';
 
 const createSortingTemplate = (activeSortType) =>
   `
@@ -10,7 +10,7 @@ const createSortingTemplate = (activeSortType) =>
           class="
             sorting-price__link
             sorting-price__link--incr
-            ${(activeSortType === SortType.PRICE_UP) ? 'sorting-price__link--active' : ''}
+            ${activeSortType === SortType.PRICE_UP ? 'sorting-price__link--active' : ''}
           "
           href="#"
           aria-label="сортировка по возрастанию цены"
@@ -23,7 +23,7 @@ const createSortingTemplate = (activeSortType) =>
         <a
           class="
             sorting-price__link
-            ${(activeSortType === SortType.PRICE_DOWN) ? 'sorting-price__link--active' : ''}
+            ${activeSortType === SortType.PRICE_DOWN ? 'sorting-price__link--active' : ''}
           "
           href="#"
           aria-label="сортировка по убыванию цены"
@@ -42,7 +42,7 @@ const createSortingTemplate = (activeSortType) =>
  * сам View не сортирует каталог.
  */
 export default class SortingView extends AbstractView {
-  #currentSortType = null;
+  #currentSortType;
 
   constructor(currentSortType) {
     super();
@@ -59,7 +59,7 @@ export default class SortingView extends AbstractView {
   };
 
   #sortTypeChangeHandler = (evt) => {
-    const targetLink = evt.target.closest('a');
+    const targetLink = evt.target.closest('[data-sort-type]');
 
     if (!targetLink) {
       return;

@@ -30,7 +30,13 @@ export default class MainPagePresenter {
   #filterReasonPresenter = null;
   #filterColorPresenter = null;
 
-  constructor(bodyContainer, mainContainer, bouquetsModel, deferredModel, filterModel) {
+  constructor(
+    bodyContainer,
+    mainContainer,
+    bouquetsModel,
+    deferredModel,
+    filterModel
+  ) {
     this.#bodyContainer = bodyContainer;
     this.#mainContainer = mainContainer;
     this.#bouquetsModel = bouquetsModel;
@@ -46,11 +52,16 @@ export default class MainPagePresenter {
     if (this.#cataloguePresenter) {
       return this.#cataloguePresenter.getRenderedBouquetsCount();
     }
+
     return null;
   }
 
   init(savedCount = null, shouldRestore = false, sortType) {
-    this.#renderMainPage(savedCount, shouldRestore, sortType);
+    this.#renderStaticSections();
+
+    this.#renderFiltersSections();
+
+    this.#renderCatalogue(savedCount, shouldRestore, sortType);
   }
 
   #renderStaticSections() {
@@ -60,10 +71,16 @@ export default class MainPagePresenter {
   }
 
   #renderFiltersSections() {
-    this.#filterReasonPresenter = new FilterReasonPresenter(this.#mainContainer, this.#filterModel);
+    this.#filterReasonPresenter = new FilterReasonPresenter(
+      this.#mainContainer,
+      this.#filterModel
+    );
     this.#filterReasonPresenter.init();
 
-    this.#filterColorPresenter = new FilterColorPresenter(this.#mainContainer, this.#filterModel);
+    this.#filterColorPresenter = new FilterColorPresenter(
+      this.#mainContainer,
+      this.#filterModel
+    );
     this.#filterColorPresenter.init();
   }
 
@@ -81,12 +98,6 @@ export default class MainPagePresenter {
     }
 
     this.#cataloguePresenter.init(savedCount);
-  }
-
-  #renderMainPage(savedCount, shouldRestore, sortType) {
-    this.#renderStaticSections();
-    this.#renderFiltersSections();
-    this.#renderCatalogue(savedCount, shouldRestore, sortType);
   }
 
   destroy() {

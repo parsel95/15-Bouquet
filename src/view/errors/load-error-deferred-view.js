@@ -1,24 +1,26 @@
 import AbstractView from '../../framework/view/abstract-view.js';
+
 import {ErrorMessage} from '../../const.js';
 
-const createLoadErrorDeferredTemplate = () => `
-  <div class="load-error-deferred" role="alertdialog" aria-modal="true">
-    <div class="load-error-deferred__content">
-      <p class="load-error-deferred__title">
-        Упс, что-то пошло не так
-      </p>
+const createLoadErrorDeferredTemplate = () =>
+  `
+    <div class="load-error-deferred" role="alertdialog" aria-modal="true">
+      <div class="load-error-deferred__content">
+        <p class="load-error-deferred__title">
+          Упс, что-то пошло не так
+        </p>
 
-      <p class="load-error-deferred__text"></p>
+        <p class="load-error-deferred__text"></p>
 
-      <button
-        class="btn load-error-deferred__button"
-        type="button"
-      >
-        попробовать снова
-      </button>
+        <button
+          class="btn load-error-deferred__button"
+          type="button"
+        >
+          попробовать снова
+        </button>
+      </div>
     </div>
-  </div>
-`;
+  `;
 
 /**
  * Показывает ошибку загрузки или синхронизации отложенных букетов.
@@ -30,16 +32,22 @@ export default class LoadErrorDeferredView extends AbstractView {
   }
 
   setText = (type) => {
-    this.element.querySelector('.load-error-deferred__text').textContent = ErrorMessage[type];
+    this.element
+      .querySelector('.load-error-deferred__text')
+      .textContent = ErrorMessage[type];
   };
 
   setClickHandler = (callback) => {
     this._callback.click = callback;
-    this.element.querySelector('.load-error-deferred__button').addEventListener('click', this.#clickHandler);
+    this.element
+      .querySelector('.load-error-deferred__button')
+      .addEventListener('click', this.#clickHandler);
   };
 
   removeClickHandler = () => {
-    this.element.querySelector('.load-error-deferred__button').removeEventListener('click', this.#clickHandler);
+    this.element
+      .querySelector('.load-error-deferred__button')
+      .removeEventListener('click', this.#clickHandler);
   };
 
   #clickHandler = (evt) => {

@@ -6,13 +6,16 @@ import '../vendor/swiper.js';
  * нужно вызывать при завершении жизненного цикла View слайдера.
  */
 export default class ImageSlider {
+  #sliderElement = null;
+  #slider = null;
+
   constructor(sliderElement) {
-    this.sliderElement = sliderElement;
+    this.#sliderElement = sliderElement;
   }
 
   init() {
     // eslint-disable-next-line no-undef
-    this.slider = new Swiper(this.sliderElement, {
+    this.#slider = new Swiper(this.#sliderElement, {
       slidesPerView: 1,
       spaceBetween: 100,
       speed: 700,
@@ -28,7 +31,7 @@ export default class ImageSlider {
   }
 
   destroy() {
-    this.slider?.destroy();
-    this.slider = null;
+    this.#slider?.destroy();
+    this.#slider = null;
   }
 }

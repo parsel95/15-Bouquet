@@ -49,8 +49,8 @@ const LabelType = {
 
 // Конфигурация логотипа
 const LogoConfig = {
-  HEADER: { width: 86, height: 84 },
-  FOOTER: { width: 60, height: 59 }
+  HEADER: {width: 86, height: 84},
+  FOOTER: {width: 60, height: 59}
 };
 
 // Имя родительского элемента для логотипа в футере

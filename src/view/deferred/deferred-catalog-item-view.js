@@ -51,8 +51,8 @@ const createDeferredCatalogItemTemplate = ({title, description, price, previewIm
  * действия пользователя передаются Presenter-у через callbacks.
  */
 export default class DeferredCatalogItemView extends AbstractView {
-  #bouquet = null;
-  #count = null;
+  #bouquet;
+  #count;
 
   constructor(bouquet, count) {
     super();
@@ -67,19 +67,25 @@ export default class DeferredCatalogItemView extends AbstractView {
   setDecrementClickHandler = (callback) => {
     this._callback.decrementClick = callback;
 
-    this.element.querySelector('.btn-calculate--minus').addEventListener('click', this.#decrementClickHandler);
+    this.element
+      .querySelector('.btn-calculate--minus')
+      .addEventListener('click', this.#decrementClickHandler);
   };
 
   setIncrementClickHandler = (callback) => {
     this._callback.incrementClick = callback;
 
-    this.element.querySelector('.btn-calculate--plus').addEventListener('click', this.#incrementClickHandler);
+    this.element
+      .querySelector('.btn-calculate--plus')
+      .addEventListener('click', this.#incrementClickHandler);
   };
 
-  setCloseBtnClickHandler = (callback) => {
-    this._callback.closeBtnClick = callback;
+  setCloseButtonClickHandler = (callback) => {
+    this._callback.closeButtonClick = callback;
 
-    this.element.querySelector('.btn-close').addEventListener('click', this.#closeBtnClick);
+    this.element
+      .querySelector('.btn-close')
+      .addEventListener('click', this.#closeButtonClick);
   };
 
   #decrementClickHandler = (evt) => {
@@ -92,8 +98,8 @@ export default class DeferredCatalogItemView extends AbstractView {
     this._callback.incrementClick();
   };
 
-  #closeBtnClick = (evt) => {
+  #closeButtonClick = (evt) => {
     evt.preventDefault();
-    this._callback.closeBtnClick();
+    this._callback.closeButtonClick();
   };
 }

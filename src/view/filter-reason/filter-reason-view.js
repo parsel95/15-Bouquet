@@ -1,9 +1,13 @@
 import AbstractView from '../../framework/view/abstract-view.js';
-import { createFilterReasonItemTemplate } from './filter-reason-item-template.js';
+
+import {createFilterReasonItemTemplate} from './filter-reason-item-template.js';
 
 const createFilterReasonTemplate = (filters, currentReason, text) => {
-  const reasonItems = filters.map((type, index) =>
-    createFilterReasonItemTemplate(currentReason, type, text[type], index)).join('');
+  const reasonItems = filters
+    .map((type, index) =>
+      createFilterReasonItemTemplate(currentReason, type, text[type], index)
+    )
+    .join('');
   return `
     <section class="filter-reason">
       <div class="container">
@@ -24,9 +28,9 @@ const createFilterReasonTemplate = (filters, currentReason, text) => {
  * При изменении контрола передаёт тип фильтра Presenter-у.
  */
 export default class FilterReasonView extends AbstractView {
-  #filters = null;
-  #currentReason = null;
-  #text = null;
+  #filters;
+  #currentReason;
+  #text;
 
   constructor(filters, currentReason, text) {
     super();
@@ -39,13 +43,12 @@ export default class FilterReasonView extends AbstractView {
     return createFilterReasonTemplate(this.#filters, this.#currentReason, this.#text);
   }
 
-  setFilterTypeChangeHandler(callback) {
+  setFilterTypeChangeHandler = (callback) => {
     this._callback.filterTypeChange = callback;
     this.element.addEventListener('change', this.#filterTypeChangeHandler);
-  }
+  };
 
   #filterTypeChangeHandler = (evt) => {
-    evt.preventDefault();
     this._callback.filterTypeChange(evt.target.dataset.filterReason);
   };
 }

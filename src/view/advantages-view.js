@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const createAdvantagesViewTemplate = () =>
   `
@@ -7,7 +7,17 @@ const createAdvantagesViewTemplate = () =>
         <div class="advantages__wrapper">
           <div class="advantages__img">
             <picture>
-              <source type="image/webp" srcset="img/content/flor-saurina.webp, img/content/flor-saurina@2x.webp 2x"><img src="img/content/flor-saurina.png" srcset="img/content/flor-saurina@2x.png 2x" width="1044" height="810" alt="букет">
+              <source
+                type="image/webp"
+                srcset="img/content/flor-saurina.webp, img/content/flor-saurina@2x.webp 2x"
+              >
+              <img
+                src="img/content/flor-saurina.png"
+                srcset="img/content/flor-saurina@2x.png 2x"
+                width="1044"
+                height="810"
+                alt="букет"
+              >
             </picture>
           </div>
           <div class="advantages__content">
@@ -15,7 +25,10 @@ const createAdvantagesViewTemplate = () =>
           </div>
           <ul class="advantages-list">
             <li class="advantages-list__item">
-              <p>доставка<br>за&nbsp;1&nbsp;час</p>
+              <p>
+                доставка
+                <br>за&nbsp;1&nbsp;час
+              </p>
               <svg width="122" height="82" aria-hidden="true">
                 <use xlink:href="#icon-delivery"></use>
               </svg>

@@ -1,4 +1,5 @@
 import Observable from '../framework/observable.js';
+
 import {ReasonType, ColorType} from '../const.js';
 
 /**
@@ -59,7 +60,9 @@ export default class FilterModel extends Observable {
   };
 
   #deleteColorFilter = (colorFilter) => {
-    this.#colorFilters = this.#colorFilters.filter((filter) => filter !== colorFilter);
+    this.#colorFilters = this.#colorFilters.filter(
+      (filter) => filter !== colorFilter
+    );
   };
 
   /**

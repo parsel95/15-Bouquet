@@ -2,7 +2,7 @@ import AbstractView from '../../framework/view/abstract-view.js';
 
 const createLoadMoreButtonViewTemplate = () =>
   `<button class="btn btn--outlined catalogue__show-more-btn" type="button">
-      больше букетов
+    больше букетов
   </button>`;
 
 /**

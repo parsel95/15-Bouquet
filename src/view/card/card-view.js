@@ -45,7 +45,7 @@ const createCardViewTemplate = ({title, description, type, price, previewImage},
  * и передаёт Presenter-у события открытия и переключения статуса.
  */
 export default class CardView extends AbstractView {
-  #bouquet = null;
+  #bouquet;
   #isDeferred = false;
 
   constructor(bouquet, isDeferred) {
@@ -60,12 +60,16 @@ export default class CardView extends AbstractView {
 
   setOpenClickHandler = (callback) => {
     this._callback.openClick = callback;
-    this.element.querySelector('.item-card__btn').addEventListener('click', this.#openClickHandler);
+    this.element
+      .querySelector('.item-card__btn')
+      .addEventListener('click', this.#openClickHandler);
   };
 
   setDeferredClickHandler = (callback) => {
     this._callback.deferredClick = callback;
-    this.element.querySelector('.button-heart').addEventListener('click', this.#deferredClickHandler);
+    this.element
+      .querySelector('.button-heart')
+      .addEventListener('click', this.#deferredClickHandler);
   };
 
   #openClickHandler = (evt) => {

@@ -1,4 +1,5 @@
-import Observable from '../framework/observable';
+import Observable from '../framework/observable.js';
+
 import {UpdateType} from '../const.js';
 
 /**
@@ -38,7 +39,6 @@ export default class BouquetsModel extends Observable {
       const bouquets = await this.#apiService.get();
 
       this.#bouquets = bouquets.map(this.#adaptToClient);
-      this.#isLoadError = false;
     } catch {
       this.#bouquets = [];
       this.#isLoadError = true;
@@ -91,11 +91,5 @@ export default class BouquetsModel extends Observable {
     }
   };
 
-  #adaptColor = (color) => {
-    if (color === 'violet') {
-      return 'lilac';
-    } else {
-      return color;
-    }
-  };
+  #adaptColor = (color) => color === 'violet' ? 'lilac' : color;
 }

@@ -2,13 +2,15 @@ import HeaderView from '../view/header/header-view.js';
 import FooterView from '../view/footer-view.js';
 import LogoView from '../view/logo-view.js';
 
-import MainPagePresenter from'./main-page-presenter.js';
+import MainPagePresenter from './main-page-presenter.js';
 import HeaderCountPresenter from './header-count-presenter.js';
 import DeferredPresenter from './deferred-presenter.js';
 
 import {render, RenderPosition} from '../framework/render.js';
 import {setToZeroOpacity, setToFullOpacity} from '../utils/animation.js';
 import {logoParentName, Page} from '../const.js';
+
+const PAGE_TRANSITION_TIME = 400;
 
 /**
  * Управляет общими элементами приложения и жизненным циклом страниц.
@@ -82,15 +84,11 @@ export default class AppPresenter {
   }
 
   #destroyCurrentPage() {
-    if (this.#mainPagePresenter) {
-      this.#mainPagePresenter.destroy();
-      this.#mainPagePresenter = null;
-    }
+    this.#mainPagePresenter?.destroy();
+    this.#deferredPresenter?.destroy();
 
-    if (this.#deferredPresenter) {
-      this.#deferredPresenter.destroy();
-      this.#deferredPresenter = null;
-    }
+    this.#mainPagePresenter = null;
+    this.#deferredPresenter = null;
   }
 
   #renderMainPage(shouldRestore) {
@@ -138,10 +136,16 @@ export default class AppPresenter {
    *
    * @param {string} targetPage Страница, которую нужно показать.
    * @param {boolean} [shouldRestore=false] Нужно ли восстановить каталог.
-   * @param {number} [time=400] Задержка перехода в миллисекундах.
    */
-  #switchPage = (targetPage, shouldRestore = false, time = 400) => {
+  #switchPage = (targetPage, shouldRestore = false) => {
     if (this.#isSwitchingPage) {
+      return;
+    }
+
+    if (targetPage === Page.MAIN && this.#mainPagePresenter) {
+      return;
+    }
+    if (targetPage === Page.DEFERRED && this.#deferredPresenter) {
       return;
     }
 
@@ -152,13 +156,6 @@ export default class AppPresenter {
     }
 
     window.scrollTo(0, 0);
-
-    if (targetPage === Page.MAIN && this.#mainPagePresenter) {
-      return;
-    }
-    if (targetPage === Page.DEFERRED && this.#deferredPresenter) {
-      return;
-    }
 
     this.#isSwitchingPage = true;
     setToZeroOpacity(this.#mainContainer, 0.5);
@@ -174,6 +171,6 @@ export default class AppPresenter {
 
       this.#isSwitchingPage = false;
       setToFullOpacity(this.#mainContainer);
-    }, time);
+    }, PAGE_TRANSITION_TIME);
   };
 }

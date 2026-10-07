@@ -1,9 +1,11 @@
-import { createModalSliderImgTemplate } from './modal-slider-img-template.js';
+import {createModalSliderImgTemplate} from './modal-slider-img-template.js';
 
 export const createModalSliderTemplate = ({authorPhoto, images}) => {
-
-  const pictures = images.map((picture, index) =>
-    createModalSliderImgTemplate(picture, authorPhoto, index)).join('');
+  const pictures = images
+    .map((picture, index) =>
+      createModalSliderImgTemplate(picture, authorPhoto, index)
+    )
+    .join('');
 
   return `
     <div class="image-slider swiper modal-product__slider">
@@ -12,7 +14,11 @@ export const createModalSliderTemplate = ({authorPhoto, images}) => {
       </div>
 
       <button
-        class="btn-round btn-round--to-left image-slider__button image-slider__button--prev"
+        class="
+          btn-round btn-round--to-left
+          image-slider__button
+          image-slider__button--prev
+        "
         type="button"
         aria-label="Предыдущий слайд"
       >
@@ -22,7 +28,12 @@ export const createModalSliderTemplate = ({authorPhoto, images}) => {
       </button>
 
       <button
-        class="btn-round btn-round--to-right image-slider__button image-slider__button--next"
+        class="
+          btn-round
+          btn-round--to-right
+          image-slider__button
+          image-slider__button--next
+        "
         type="button"
         aria-label="Следующий слайд"
       >

@@ -5,10 +5,9 @@ import {UserAction, UpdateType} from '../const.js';
 /**
  * Управляет карточкой букета на странице отложенных.
  *
- * Изменения количества передаёт родительскому Presenter-у. Для обычного
- * изменения используется PATCH, чтобы обновить карточку; удаление последнего
- * экземпляра и удаление всей карточки используют MINOR, чтобы перестроить
- * список.
+ * Передаёт действия с количеством и удалением карточки
+ * родительскому Presenter-у. Тип обновления зависит от операции:
+ * PATCH обновляет существующую карточку, MINOR перестраивает список.
  */
 export default class DeferredCardPresenter {
   #cardComponent = null;
@@ -31,10 +30,12 @@ export default class DeferredCardPresenter {
 
     const prevCardComponent = this.#cardComponent;
 
-    this.#cardComponent = new DeferredCatalogItemView(this.#bouquet, count);
+    this.#cardComponent = new DeferredCatalogItemView(bouquet, count);
 
-    this.#cardComponent.setCloseBtnClickHandler(this.#handleCloseBtnClick);
-    this.#cardComponent.setDecrementClickHandler(() => this.#handleDecrementClick(count));
+    this.#cardComponent.setCloseButtonClickHandler(this.#handleCloseBtnClick);
+    this.#cardComponent.setDecrementClickHandler(
+      () => this.#handleDecrementClick(count)
+    );
     this.#cardComponent.setIncrementClickHandler(this.#handleIncrementClick);
 
     if (prevCardComponent === null) {
@@ -47,19 +48,15 @@ export default class DeferredCardPresenter {
   }
 
   #handleDecrementClick = (count) => {
-    if (count === 1) {
-      this.#changeData(
-        UserAction.DECREMENT_DEFERRED,
-        UpdateType.MINOR,
-        {...this.#bouquet}
-      );
-    } else {
-      this.#changeData(
-        UserAction.DECREMENT_DEFERRED,
-        UpdateType.PATCH,
-        {...this.#bouquet}
-      );
-    }
+    const updateType = count === 1
+      ? UpdateType.MINOR
+      : UpdateType.PATCH;
+
+    this.#changeData(
+      UserAction.DECREMENT_DEFERRED,
+      updateType,
+      {...this.#bouquet}
+    );
   };
 
   #handleIncrementClick = () => {

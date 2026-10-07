@@ -1,8 +1,9 @@
 import AbstractView from '../../framework/view/abstract-view.js';
-import { createHeroMainTemplate } from './hero-main-template.js';
-import { createHeroPopupTemplate } from './hero-popup-template.js';
 
-const createHeroViewTemplate = ({isPopup}) =>
+import {createHeroMainTemplate} from './hero-main-template.js';
+import {createHeroPopupTemplate} from './hero-popup-template.js';
+
+const createHeroViewTemplate = (isPopup) =>
   `
     <section class="hero ${isPopup ? 'hero--popup' : ''}">
       <div class="hero__wrapper">
@@ -12,9 +13,8 @@ const createHeroViewTemplate = ({isPopup}) =>
   `;
 
 /**
- * Отображает основной или компактный вариант hero-секции.
- * Вариант выбирается параметром isPopup; в компактном варианте
- * кнопка закрытия передаёт действие Presenter-у.
+ * Отображает основной или popup-вариант hero-секции.
+ * В popup-варианте передаёт Presenter-у действие закрытия.
  */
 export default class HeroView extends AbstractView {
   #isPopup = false;
@@ -25,14 +25,14 @@ export default class HeroView extends AbstractView {
   }
 
   get template() {
-    return createHeroViewTemplate({
-      isPopup: this.#isPopup,
-    });
+    return createHeroViewTemplate(this.#isPopup);
   }
 
   setCloseClickHandler = (callback) => {
     this._callback.click = callback;
-    this.element.querySelector('.btn-close').addEventListener('click', this.#closeClickHandler);
+    this.element
+      .querySelector('.hero__popupclose')
+      .addEventListener('click', this.#closeClickHandler);
   };
 
   #closeClickHandler = (evt) => {

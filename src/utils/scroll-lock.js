@@ -6,45 +6,49 @@
  * При снятии блокировки восстанавливает позицию прокрутки и стили.
  */
 export default class ScrollLock {
-  constructor() {
-    this._lockClass = 'scroll-lock';
-    this._scrollTop = null;
-    this._fixedBlockElements = document.querySelectorAll('[data-fix-block]');
-  }
+  #lockClass = 'scroll-lock';
+  #scrollTop = null;
+  #fixedBlockElements = document.querySelectorAll('[data-fix-block]');
 
-  _getScrollbarWidth() {
+  #getScrollbarWidth() {
     return window.innerWidth - document.documentElement.clientWidth;
   }
 
-  _getBodyScrollTop() {
-    return (
-      self.pageYOffset ||
-      (document.documentElement && document.documentElement.ScrollTop) ||
-      (document.body && document.body.scrollTop)
-    );
+  #getScrollTop() {
+    return window.scrollY;
   }
 
   disableScrolling() {
-    this._scrollTop = document.body.dataset.scroll = document.body.dataset.scroll ? document.body.dataset.scroll : this._getBodyScrollTop();
-    if (this._getScrollbarWidth()) {
-      document.body.style.paddingRight = `${this._getScrollbarWidth()}px`;
-      this._fixedBlockElements.forEach((block) => {
-        block.style.paddingRight = `${this._getScrollbarWidth()}px`;
+    const scrollTop = document.body.dataset.scroll || this.#getScrollTop();
+    const scrollbarWidth = this.#getScrollbarWidth();
+
+    this.#scrollTop = Number(scrollTop);
+    document.body.dataset.scroll = this.#scrollTop;
+
+    if (scrollbarWidth) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+
+      this.#fixedBlockElements.forEach((block) => {
+        block.style.paddingRight = `${scrollbarWidth}px`;
       });
     }
-    document.body.style.top = `-${this._scrollTop}px`;
-    document.body.classList.add(this._lockClass);
+
+    document.body.style.top = `-${this.#scrollTop}px`;
+    document.body.classList.add(this.#lockClass);
   }
 
   enableScrolling() {
-    document.body.classList.remove(this._lockClass);
-    window.scrollTo(0, +document.body.dataset.scroll);
-    document.body.style.paddingRight = null;
-    document.body.style.top = null;
-    this._fixedBlockElements.forEach((block) => {
-      block.style.paddingRight = null;
+    document.body.classList.remove(this.#lockClass);
+    window.scrollTo(0, this.#scrollTop);
+
+    document.body.style.paddingRight = '';
+    document.body.style.top = '';
+
+    this.#fixedBlockElements.forEach((block) => {
+      block.style.paddingRight = '';
     });
+
     document.body.removeAttribute('data-scroll');
-    this._scrollTop = null;
+    this.#scrollTop = null;
   }
 }

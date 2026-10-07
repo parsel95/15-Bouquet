@@ -2,17 +2,17 @@ import ModalView from '../view/modal/modal-view.js';
 import {render, remove, replace} from '../framework/render.js';
 import {UserAction, UpdateType} from '../const.js';
 
+/**
+ * Управляет модальным окном с информацией о букете.
+ *
+ * Presenter отвечает за жизненный цикл модального окна:
+ * создание View, её обновление при смене букета
+ * и корректное уничтожение при закрытии.
+ *
+ * Сам Presenter не управляет DOM напрямую — для этого
+ * используются render(), replace() и remove().
+ */
 export default class ModalPresenter {
-  /**
-   * Управляет модальным окном с информацией о букете.
-   *
-   * Presenter отвечает за жизненный цикл модального окна:
-   * создание View, её обновление при смене букета
-   * и корректное уничтожение при закрытии.
-   *
-   * Сам Presenter не управляет DOM напрямую — для этого
-   * используются render(), replace() и remove().
-   */
   #modalComponent = null;
 
   #container = null;
@@ -33,9 +33,9 @@ export default class ModalPresenter {
   /**
    * Показывает модальное окно для переданного букета.
    *
-   * При первом открытии создаётся новый ModalView.
-   * При смене букета существующее представление заменяется,
-   * после чего для нового View повторно инициализируется слайдер.
+   * При первом открытии создаёт View и инициализирует слайдер.
+   * При смене букета уничтожает ресурсы старого View,
+   * заменяет его новым и инициализирует новый слайдер.
    *
    * @param {Object} bouquet Данные букета для отображения.
    */
@@ -43,9 +43,9 @@ export default class ModalPresenter {
     this.#bouquet = bouquet;
 
     const prevModalComponent = this.#modalComponent;
-
     const isDeferred = this.#deferredModel.has(bouquet.id);
-    this.#modalComponent = new ModalView(this.#bouquet, isDeferred);
+
+    this.#modalComponent = new ModalView(bouquet, isDeferred);
 
     this.#modalComponent.setCloseClickHandler(this.#handleCloseModal);
     this.#modalComponent.setDeferredClickHandler(this.#handleDeferredClick);
@@ -56,10 +56,9 @@ export default class ModalPresenter {
       return;
     }
 
-    replace(this.#modalComponent, prevModalComponent);
+    prevModalComponent.destroy();
 
-    // Swiper работает с конкретным DOM-элементом,
-    // поэтому после замены View его нужно инициализировать заново.
+    replace(this.#modalComponent, prevModalComponent);
     this.#modalComponent.initSlider();
 
     remove(prevModalComponent);

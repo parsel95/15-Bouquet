@@ -11,7 +11,7 @@ const createHeaderCountViewTemplate = ({productCount, sum}) =>
       </button>
       <div class="header-count__count">
         <p class="text text--size-20 header-count__counter">
-        ${productCount}
+          ${productCount}
         </p>
       </div>
       <div class="header-count__block">
@@ -29,7 +29,7 @@ const createHeaderCountViewTemplate = ({productCount, sum}) =>
  * Передаёт клик по блоку Presenter-у, который открывает страницу отложенных.
  */
 export default class HeaderCountView extends AbstractView {
-  #deferred = null;
+  #deferred;
 
   constructor(deferred) {
     super();
