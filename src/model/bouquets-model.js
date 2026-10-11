@@ -66,7 +66,11 @@ export default class BouquetsModel extends Observable {
    * @param {number|string} id Идентификатор букета.
    * @returns {Promise<Object>} Данные букета.
    */
-  getById = (id) => this.#apiService.getById(id);
+  getById = async (id) => {
+    const bouquet = await this.#apiService.getById(id);
+
+    return this.#adaptToClient(bouquet);
+  };
 
   #adaptToClient = (bouquet) => ({
     ...bouquet,
