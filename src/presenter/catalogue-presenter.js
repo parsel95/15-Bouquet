@@ -26,6 +26,7 @@ import {
   ErrorMessage
 } from '../const.js';
 import {filterReason, filterColor} from '../utils/filter.js';
+import {setInertOnChildrenExcept} from '../utils/dom.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 const BOUQUET_COUNT_PER_STEP = 6;
@@ -261,10 +262,22 @@ export default class CataloguePresenter {
 
     render(this.#loadErrorDeferredComponent, this.#bodyContainer);
 
+    setInertOnChildrenExcept(
+      this.#bodyContainer,
+      this.#loadErrorDeferredComponent.element,
+      true
+    );
+
     this.#loadErrorDeferredComponent.setClickHandler(this.#handleDeferredLoadError);
   };
 
   #handleDeferredLoadError = async () => {
+    setInertOnChildrenExcept(
+      this.#bodyContainer,
+      this.#loadErrorDeferredComponent.element,
+      false
+    );
+
     remove(this.#loadErrorDeferredComponent);
     this.#loadErrorDeferredComponent.removeClickHandler();
 
@@ -533,7 +546,10 @@ export default class CataloguePresenter {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
 
-      if (document.body.inert) {
+      if (
+        document.body.inert ||
+        this.#loadErrorDeferredComponent.element.isConnected
+      ) {
         return;
       }
 
@@ -558,6 +574,14 @@ export default class CataloguePresenter {
     this.#modalPresenter = null;
     this.#selectedBouquet = null;
     this.#clearCatalogueList();
+
+    if (this.#loadErrorDeferredComponent.element.isConnected) {
+      setInertOnChildrenExcept(
+        this.#bodyContainer,
+        this.#loadErrorDeferredComponent.element,
+        false
+      );
+    }
 
     remove(this.#catalogueComponent);
     remove(this.#sortingComponent);

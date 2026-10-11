@@ -13,6 +13,7 @@ import DeferredCardPresenter from './deferred-card-presenter.js';
 
 import {render, RenderPosition, remove, replace} from '../framework/render.js';
 import {UserAction, UpdateType, ErrorType} from '../const.js';
+import {setInertOnChildrenExcept} from '../utils/dom.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 /**
@@ -144,10 +145,22 @@ export default class DeferredPresenter {
 
     render(this.#loadErrorDeferredComponent, this.#bodyContainer);
 
+    setInertOnChildrenExcept(
+      this.#bodyContainer,
+      this.#loadErrorDeferredComponent.element,
+      true
+    );
+
     this.#loadErrorDeferredComponent.setClickHandler(this.#handleDeferredLoadError);
   };
 
   #handleDeferredLoadError = async () => {
+    setInertOnChildrenExcept(
+      this.#bodyContainer,
+      this.#loadErrorDeferredComponent.element,
+      false
+    );
+
     remove(this.#loadErrorDeferredComponent);
     this.#loadErrorDeferredComponent.removeClickHandler();
 
@@ -298,7 +311,10 @@ export default class DeferredPresenter {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
 
-      if (document.body.inert) {
+      if (
+        document.body.inert ||
+        this.#loadErrorDeferredComponent.element.isConnected
+      ) {
         return;
       }
 
@@ -313,6 +329,14 @@ export default class DeferredPresenter {
 
     this.#cardPresenters.forEach((presenter) => presenter.destroy());
     this.#cardPresenters.clear();
+
+    if (this.#loadErrorDeferredComponent.element.isConnected) {
+      setInertOnChildrenExcept(
+        this.#bodyContainer,
+        this.#loadErrorDeferredComponent.element,
+        false
+      );
+    }
 
     remove(this.#deferredComponent);
     remove(this.#heroDeferredComponent);
