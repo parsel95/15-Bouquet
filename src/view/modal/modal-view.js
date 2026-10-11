@@ -12,16 +12,16 @@ const createModalViewTemplate = ({title, description, price, authorPhoto, images
         is-active
       "
       data-modal="product-card"
-      style= "opacity: 0"
+      style="opacity: 0"
     >
       <div class="modal__wrapper">
-        <div class="modal__overlay" data-close-modal=""></div>
+        <div class="modal__overlay"></div>
 
         <div class="modal__content">
           <div class="modal-product">
             <button
               class="btn-close modal-product__btn-close"
-              type="button" data-close-modal=""
+              type="button"
               aria-label="Закрыть"
             >
               <svg width="55" height="56" aria-hidden="true">
@@ -32,11 +32,11 @@ const createModalViewTemplate = ({title, description, price, authorPhoto, images
             <svg
               class="
                 modal-product__btn-close
-                modal-product__loader"
-                width="56"
-                height="56"
-                aria-hidden="true
+                modal-product__loader
               "
+              width="56"
+              height="56"
+              aria-hidden="true"
             >
               <use xlink:href="#icon-loader"></use>
             </svg>

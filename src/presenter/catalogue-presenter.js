@@ -72,6 +72,8 @@ export default class CataloguePresenter {
   #isDeferredLoading = true;
   #isBouquetsLoadError = false;
   #isErrorModalOpen = false;
+  #isModalClosing = false;
+  #isUpdatingDeferred = false;
 
   #scrollLock = new ScrollLock();
   #uiBlocker = new UiBlocker({lowerLimit: 350, upperLimit: 1000});
@@ -142,14 +144,24 @@ export default class CataloguePresenter {
 
   #handleViewAction = async (actionType, updateType, updateBouquet) => {
     if (actionType === UserAction.TOGGLE_DEFERRED) {
+      if (this.#isUpdatingDeferred) {
+        return;
+      }
+
+      this.#isUpdatingDeferred = true;
       this.#uiBlocker.block();
 
       try {
         await this.#deferredModel.toggleDeferred(updateType, updateBouquet);
       } catch (error) {
-        this.#renderCatalogueErrorModal(error.type);
+        if (error.type === ErrorType.SYNC_DEFERRED) {
+          this.#renderDeferredLoadError(ErrorType.SYNC_DEFERRED);
+        } else {
+          this.#renderCatalogueErrorModal(error.type);
+        }
       } finally {
         this.#uiBlocker.unblock();
+        this.#isUpdatingDeferred = false;
       }
     }
   };
@@ -240,6 +252,8 @@ export default class CataloguePresenter {
     this.#clearCatalogueCards();
 
     this.#renderCatalogue();
+
+    this.#modalPresenter?.updateDeferredStatus();
   }
 
   #renderDeferredLoadError = (type) => {
@@ -394,6 +408,7 @@ export default class CataloguePresenter {
 
     if (this.#selectedBouquet && this.#selectedBouquet.id !== bouquet.id) {
       this.#handleCloseModal();
+      return;
     }
 
     this.#uiBlocker.block();
@@ -419,6 +434,12 @@ export default class CataloguePresenter {
   };
 
   #handleCloseModal = () => {
+    if (this.#isModalClosing || !this.#modalPresenter) {
+      return;
+    }
+
+    this.#isModalClosing = true;
+
     setToZeroOpacity(this.#modalPresenter.modalElement(), 0.5);
 
     setTimeout(() => {
@@ -430,6 +451,8 @@ export default class CataloguePresenter {
       document.removeEventListener('keydown', this.#onEscKeyDown);
 
       setToFullOpacity(this.#catalogueComponent.element);
+
+      this.#isModalClosing = false;
     }, MODAL_CLOSE_DELAY);
   };
 
@@ -510,6 +533,10 @@ export default class CataloguePresenter {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
 
+      if (document.body.inert) {
+        return;
+      }
+
       if (this.#isErrorModalOpen) {
         this.#handleErrorModalClose();
         return;
@@ -537,6 +564,7 @@ export default class CataloguePresenter {
     remove(this.#catalogueListComponent);
     remove(this.#reloadButtonComponent);
     remove(this.#catalogueErrorModalComponent);
+    remove(this.#loadErrorDeferredComponent);
     remove(this.#catalogueListLoadingComponent);
     remove(this.#uiBlocker);
   }

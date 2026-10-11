@@ -191,7 +191,7 @@ export default class DeferredPresenter {
           await this.#deferredModel.delete(updateType, updateBouquet);
           break;
         case UserAction.CLEAR_DEFERRED:
-          this.#deferredCleanButtonComponent.isCleaning = true;
+          this.#deferredCleanButtonComponent.setCleaningState(true);
           await this.#deferredModel.cleanAll(updateType);
           break;
         default:
@@ -205,7 +205,7 @@ export default class DeferredPresenter {
       }
     } finally {
       uiBlocker.unblock();
-      this.#deferredCleanButtonComponent.isCleaning = false;
+      this.#deferredCleanButtonComponent.setCleaningState(false);
     }
   };
 
@@ -297,6 +297,11 @@ export default class DeferredPresenter {
   #onEscKeyDown = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
+
+      if (document.body.inert) {
+        return;
+      }
+
       this.#handleErrorModalClose();
     }
   };

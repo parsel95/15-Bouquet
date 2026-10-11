@@ -7,7 +7,7 @@ const createDeferredSumTemplate = ({productCount, sum}) =>
       <div class="popup-deferred__block-wrap">
         <div class="popup-deferred__block">
           <p class="text text--total">Букеты</p>
-          <span class="popup-deferred__count" data-atribute="count-defer">
+          <span class="popup-deferred__count" data-attribute="count-defer">
             ${productCount}
           </span>
         </div>

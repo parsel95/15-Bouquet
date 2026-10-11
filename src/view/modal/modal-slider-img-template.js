@@ -1,7 +1,7 @@
 export const createModalSliderImgTemplate = (picture, authorPhoto, index) => {
   const getAuthorElement = (author, idx) => idx === 0 ?
     `<span class="image-author image-slide__author">
-      Автор  фотографии: «${author}»
+      Автор фотографии: «${author}»
     </span>`
     : '';
 

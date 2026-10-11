@@ -81,7 +81,6 @@ const UserAction = {
 const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
-  MAJOR: 'MAJOR',
   INIT: 'INIT',
   LOADING: 'LOADING',
   ERROR_LOAD_DEFERRED: 'ERROR_LOAD_DEFERRED',
@@ -89,7 +88,6 @@ const UpdateType = {
 
 // Типы HTTP-методов
 const Method = {
-  GET: 'GET',
   PUT: 'PUT',
   DELETE: 'DELETE',
 };
@@ -144,12 +142,6 @@ const ErrorMessage = {
 };
 
 const ErrorThrowMessage = {
-  [ErrorType.LOAD_BOUQUETS]:
-    'Can\'t load bouquets',
-
-  [ErrorType.LOAD_DEFERRED]:
-    'Can\'t load deferred',
-
   [ErrorType.ADD_DEFERRED]:
     'Can\'t add bouquet to deferred',
 
@@ -161,9 +153,6 @@ const ErrorThrowMessage = {
 
   [ErrorType.CLEAN_ALL_DEFERRED]:
     'Can\'t clean all deferred',
-
-  [ErrorType.LOAD_MODAL]:
-    'Can\'t load modal data',
 
   [ErrorType.SYNC_DEFERRED]:
     'Can\'t synchronize deferred',

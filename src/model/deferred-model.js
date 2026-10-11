@@ -17,10 +17,9 @@ const createEmptyDeferred = () => ({
  * Отвечает за:
  * - загрузку состояния с сервера;
  * - добавление и удаление экземпляров букетов;
- * - изменение локального состояния;
- * - оптимистичные обновления;
- * - откат локального изменения при ошибке запроса;
- * - синхронизацию с сервером после частичных сбоев.
+ * - оптимистичные обновления локального состояния;
+ * - синхронизацию с сервером после ошибок операций;
+ * - уведомление подписчиков об изменениях состояния.
  *
  * Наследуется от Observable и уведомляет подписчиков
  * об изменениях состояния.
@@ -64,8 +63,8 @@ export default class DeferredModel extends Observable {
   /**
    * Получает актуальное состояние отложенных непосредственно с сервера.
    *
-   * Используется для синхронизации локального состояния после
-   * частичного сбоя нескольких серверных операций.
+   * Используется для синхронизации локального состояния после ошибок
+   * одиночных и массовых операций изменения отложенных.
    */
   getActualDeferred = async () => this.#normalizeDeferred(await this.#apiService.get());
 
@@ -153,11 +152,15 @@ export default class DeferredModel extends Observable {
   }
 
   /**
-   * Оптимистично добавляет букет в отложенные и отправляет
-   * соответствующий запрос на сервер.
+   * Оптимистично добавляет экземпляр букета в отложенные
+   * и отправляет соответствующий запрос на сервер.
    *
-   * При ошибке запроса локальное изменение откатывается,
-   * после чего ошибка передаётся вызывающему коду.
+   * При ошибке запроса синхронизирует локальное состояние с сервером,
+   * поскольку операция могла быть применена несмотря на ошибку ответа.
+   *
+   * После успешной синхронизации передаёт вызывающему коду ошибку
+   * первоначальной операции. Если синхронизация не удалась,
+   * выбрасывается ошибка SYNC_DEFERRED.
    */
   add = async (updateType, bouquet) => {
     this.#increment(updateType, bouquet);
@@ -165,7 +168,7 @@ export default class DeferredModel extends Observable {
     try {
       await this.#apiService.add(bouquet);
     } catch {
-      this.#decrement(updateType, bouquet);
+      await this.#syncDeferred(updateType, bouquet);
 
       throw this.#createError(
         ErrorThrowMessage.ADD_DEFERRED,
@@ -178,7 +181,12 @@ export default class DeferredModel extends Observable {
    * Оптимистично удаляет один экземпляр букета из отложенных
    * и отправляет соответствующий запрос на сервер.
    *
-   * При ошибке запроса локальное изменение откатывается.
+   * При ошибке запроса синхронизирует локальное состояние с сервером,
+   * поскольку операция могла быть применена несмотря на ошибку ответа.
+   *
+   * После успешной синхронизации передаёт вызывающему коду ошибку
+   * первоначальной операции. Если синхронизация не удалась,
+   * выбрасывается ошибка SYNC_DEFERRED.
    */
   delete = async (updateType, bouquet) => {
     this.#decrement(updateType, bouquet);
@@ -186,7 +194,7 @@ export default class DeferredModel extends Observable {
     try {
       await this.#apiService.delete(bouquet.id);
     } catch {
-      this.#increment(updateType, bouquet);
+      await this.#syncDeferred(updateType, bouquet);
 
       throw this.#createError(
         ErrorThrowMessage.DELETE_DEFERRED,
@@ -198,11 +206,16 @@ export default class DeferredModel extends Observable {
   /**
    * Удаляет все экземпляры всех букетов из отложенных.
    *
-   * Запросы выполняются через Promise.allSettled(), поскольку
-   * отдельные удаления могут завершиться с разными результатами.
+   * Запросы для разных букетов выполняются параллельно,
+   * а экземпляры одного букета удаляются последовательно.
+   * Это позволяет избежать одновременного удаления нескольких
+   * экземпляров с одним идентификатором.
    *
-   * При частичном сбое локальное состояние не откатывается вручную.
-   * Вместо этого оно повторно загружается с сервера для синхронизации.
+   * Если хотя бы один запрос завершается ошибкой,
+   * синхронизирует локальное состояние с сервером.
+   *
+   * При успешной синхронизации выбрасывает ошибку CLEAN_ALL_DEFERRED.
+   * Если синхронизация не удалась, выбрасывается ошибка SYNC_DEFERRED.
    */
   cleanAll = async (updateType) => {
     const bouquetIds = Object.keys(this.#deferred.products);
@@ -236,16 +249,23 @@ export default class DeferredModel extends Observable {
   };
 
   /**
-   * Полностью удаляет один букет из списка отложенных
-   * вместе со всеми его экземплярами.
+   * Удаляет все экземпляры выбранного букета из отложенных.
    *
-   * При частичном сбое запросов состояние синхронизируется
-   * с сервером через getActualDeferred().
+   * Локальное состояние обновляется оптимистично.
+   * Запросы на удаление экземпляров одного букета выполняются
+   * последовательно. При ошибке отдельного запроса остальные
+   * удаления продолжаются.
+   *
+   * Если хотя бы один запрос завершается ошибкой,
+   * синхронизирует локальное состояние с сервером.
+   *
+   * После успешной синхронизации выбрасывает ошибку
+   * CLEAN_CARD_DEFERRED. Если синхронизация не удалась,
+   * выбрасывается ошибка SYNC_DEFERRED.
    */
   deleteCard = async (updateType, bouquet) => {
     const savedCount = this.#deferred.products[bouquet.id];
     const savedPrice = bouquet.price * savedCount;
-    const deleteRequests = [];
 
     this.#deferred.productCount -= savedCount;
     this.#deferred.sum -= savedPrice;
@@ -254,22 +274,21 @@ export default class DeferredModel extends Observable {
 
     this._notify(updateType, bouquet);
 
-    for (let i = 0; i < savedCount; i++) {
-      deleteRequests.push(
-        this.#apiService.delete(bouquet.id)
-      );
-    }
+    let hasError = false;
 
-    const results = await Promise.allSettled(deleteRequests);
-    const hasError = results.some(
-      (result) => result.status === 'rejected'
-    );
+    for (let i = 0; i < savedCount; i++) {
+      try {
+        await this.#apiService.delete(bouquet.id);
+      } catch {
+        hasError = true;
+      }
+    }
 
     if (!hasError) {
       return;
     }
 
-    await this.#syncDeferred(updateType);
+    await this.#syncDeferred(updateType, bouquet);
 
     throw this.#createError(
       ErrorThrowMessage.CLEAN_CARD_DEFERRED,
@@ -297,18 +316,34 @@ export default class DeferredModel extends Observable {
     return this.add(updateType, bouquet);
   };
 
-  #syncDeferred = async (updateType) => {
-    try {
-      const actualDeferred = await this.getActualDeferred();
+  /**
+   * Синхронизирует локальное состояние отложенных с сервером.
+   *
+   * Получает актуальное состояние, заменяет им локальное
+   * и уведомляет подписчиков об изменении.
+   *
+   * Если передан букет, он включается в уведомление,
+   * чтобы Presenter мог обновить соответствующую карточку.
+   *
+   * При ошибке получения состояния выбрасывает SYNC_DEFERRED.
+   *
+   * @param {string} updateType Тип обновления для уведомления подписчиков.
+   * @param {Object} [bouquet] Букет, связанный с операцией.
+   */
+  #syncDeferred = async (updateType, bouquet) => {
+    let actualDeferred;
 
-      this.#deferred = actualDeferred;
-      this._notify(updateType);
+    try {
+      actualDeferred = await this.getActualDeferred();
     } catch {
       throw this.#createError(
         ErrorThrowMessage.SYNC_DEFERRED,
         ErrorType.SYNC_DEFERRED
       );
     }
+
+    this.#deferred = actualDeferred;
+    this._notify(updateType, bouquet);
   };
 
   #createError(message, type) {

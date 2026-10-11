@@ -1,4 +1,4 @@
-import AbstractView from '../../framework/view/abstract-view';
+import AbstractView from '../../framework/view/abstract-view.js';
 import './ui-blocker.css';
 
 const createUiBlockerTemplate = () => '<div class="ui-blocker"></div>';
@@ -44,6 +44,7 @@ export default class UiBlocker extends AbstractView {
 
   /** Метод для блокировки интерфейса */
   block() {
+    document.body.inert = true;
     this.#addClass('ui-blocker-blocked');
     this.#startTime = Date.now();
 
@@ -63,24 +64,35 @@ export default class UiBlocker extends AbstractView {
 
     if (!this.#showLoader) {
       this.#removeClass('ui-blocker-blocked');
+
+      document.body.inert = false;
+
       return;
     }
 
     if (duration < this.#lowerLimit) {
       clearTimeout(this.#timerId);
       this.#removeClass('ui-blocker-blocked');
+
+      document.body.inert = false;
+
       return;
     }
 
     if (duration >= this.#upperLimit) {
       this.#removeClass('ui-blocker--loading');
       this.#removeClass('ui-blocker-blocked');
+
+      document.body.inert = false;
+
       return;
     }
 
     setTimeout(() => {
       this.#removeClass('ui-blocker--loading');
       this.#removeClass('ui-blocker-blocked');
+
+      document.body.inert = false;
     }, this.#upperLimit - duration);
   }
 
